@@ -1,7 +1,7 @@
 package com.iskahoot.server;
 
-import com.iskahoot.common.models.Question;
-import com.iskahoot.common.models.Quiz;
+//import com.iskahoot.common.models.Question;
+//import com.iskahoot.common.models.Quiz;
 
 import java.util.List;
 

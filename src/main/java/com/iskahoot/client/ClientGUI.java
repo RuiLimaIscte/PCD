@@ -1,16 +1,21 @@
 package com.iskahoot.client;
 
+import com.iskahoot.common.models.Question;
+
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * GUI for the client application
  * TODO: Implement in Phase 1
  */
 public class ClientGUI extends JFrame {
-    private Client client;
+    //private Client client;
 
-    // GUI Components
     private JLabel questionLabel;
     private JButton[] optionButtons;
     private JLabel timerLabel;
@@ -25,6 +30,9 @@ public class ClientGUI extends JFrame {
     private int selectedOption = -1;
     private boolean waitingForAnswer = false;
 
+    private List<Question> questions;
+    private int currentQuestionIndex = 0;
+
 //    public ClientGUI(Client client) {
 //        this.client = client;
 //        initializeGUI();
@@ -32,6 +40,41 @@ public class ClientGUI extends JFrame {
 
     public ClientGUI() {
         initializeGUI();
+    }
+
+    public ClientGUI(List<Question> questions) {
+        this.questions = questions;
+        currentQuestionIndex = 0;
+        initializeGUI();
+
+        if (questions != null && !questions.isEmpty()) {
+            showNextQuestion();
+        } else {
+            questionLabel.setText("Sem perguntas carregadas!");
+        }
+    }
+
+    public void showNextQuestion() {
+        if (currentQuestionIndex < questions.size()) {
+            Question q = questions.get(currentQuestionIndex);
+            displayQuestion(q.getQuestion(),
+                    q.getOptions().toArray(new String[0]), 30);
+        } else {
+            showGameEnded("Jogo concluído!");
+        }
+    }
+
+    /**
+     * Avança para a próxima questão
+     */
+    public void nextQuestion() {
+        currentQuestionIndex++;
+        if (currentQuestionIndex < questions.size()) {
+            resetForNextQuestion();
+            showNextQuestion();
+        } else {
+            showGameEnded("Jogo concluído!");
+        }
     }
 
     private void initializeGUI() {
@@ -56,7 +99,7 @@ public class ClientGUI extends JFrame {
         JPanel centerPanel = new JPanel(new BorderLayout(10, 10));
         centerPanel.setOpaque(false);
 
-        // Question Panel
+
         questionPanel = createQuestionPanel();
         centerPanel.add(questionPanel, BorderLayout.NORTH);
 
@@ -65,9 +108,20 @@ public class ClientGUI extends JFrame {
 
         mainPanel.add(centerPanel, BorderLayout.CENTER);
 
-        // Scoreboard Panel (Right) - ADICIONAR ISTO
         JPanel scoreboardPanel = createScoreboardPanel();
         mainPanel.add(scoreboardPanel, BorderLayout.EAST);
+
+        JButton nextButton = new JButton("Próxima Pergunta");
+        nextButton.setFont(new Font("Arial", Font.BOLD, 18));
+        nextButton.setBackground(new Color(46, 49, 146));
+        nextButton.setForeground(Color.WHITE);
+        nextButton.setFocusPainted(false);
+        nextButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        nextButton.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+
+        nextButton.addActionListener(e -> nextQuestion());
+
+        mainPanel.add(nextButton, BorderLayout.SOUTH);
 
 
         add(mainPanel);
@@ -195,30 +249,46 @@ public class ClientGUI extends JFrame {
     /**
      * Display a question with options
      */
-    public void displayQuestion(String question, String[] options, int timeLimit) {
-        // Update question text
-        questionLabel.setText("<html><div style='text-align: center;'>" + question + "</div></html>");
+    public void displayQuestion(String questionText, String[] options, int timeLimit) {
+        // garantir execução na Event Dispatch Thread (conceito fundamental de Swing)
+        SwingUtilities.invokeLater(() -> {
+            // Atualizar o texto da pergunta
+            questionLabel.setText(questionText);
 
-        // Update option buttons
-        String[] choice = {"1", "2", "3", "4"};
-        for (int i = 0; i < optionButtons.length && i < options.length; i++) {
-            optionButtons[i].setText("<html><div style='text-align: center;'>" +
-                    choice[i] + "<br>" + options[i] + "</div></html>");
-            optionButtons[i].setEnabled(true);
-            optionButtons[i].setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-            optionButtons[i].setVisible(true);
-        }
+            // Atualizar as opções
+            for (int i = 0; i < optionButtons.length; i++) {
+                if (i < options.length) {
+                    optionButtons[i].setText(options[i]);
+                    optionButtons[i].setEnabled(true);
+                    optionButtons[i].setVisible(true);
+                } else {
+                    optionButtons[i].setVisible(false);
+                }
 
-        // Hide extra buttons if less than 4 options
-        for (int i = options.length; i < optionButtons.length; i++) {
-            optionButtons[i].setVisible(false);
-        }
+                // Remover qualquer listener antigo
+                for (ActionListener al : optionButtons[i].getActionListeners()) {
+                    optionButtons[i].removeActionListener(al);
+                }
 
-        selectedOption = -1;
-        waitingForAnswer = true;
+                // Adicionar ActionListener
+                final int optionIndex = i;
+                optionButtons[i].addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        if (waitingForAnswer) {
+                            selectOption(optionIndex);
+                        }
+                    }
+                });
+            }
 
-        // Start timer
-        startTimer(timeLimit);
+            // Preparar estado do jogo
+            selectedOption = -1;
+            waitingForAnswer = true;
+
+            // Iniciar temporizador (thread separada)
+            startTimer(timeLimit);
+        });
     }
 
     /**
@@ -245,9 +315,9 @@ public class ClientGUI extends JFrame {
         }
 
         // Notify client about the selection
-        if (client != null) {
-            // client.sendAnswer(optionIndex);
-        }
+//        if (client != null) {
+//            // client.sendAnswer(optionIndex);
+//        }
 
         System.out.println("Selected option: " + optionIndex);
     }
@@ -334,7 +404,7 @@ public class ClientGUI extends JFrame {
 
         // Update question label
         questionLabel.setText("<html><div style='text-align: center; color: #2e3192;'>" +
-                "<h1>🏆 Game Over! 🏆</h1></div></html>");
+                "<h1> Game Over! </h1></div></html>");
 
         // Disable all buttons
         for (JButton button : optionButtons) {
@@ -348,7 +418,7 @@ public class ClientGUI extends JFrame {
         timerLabel.setForeground(Color.WHITE);
 
         // Show final results in scoreboard
-        scoreboardArea.setText("=== FINAL RESULTS ===\n\n" + finalResults);
+        scoreboardArea.setText(" FINAL RESULTS \n\n" + finalResults);
         scoreboardArea.setCaretPosition(0);
 
         // Show dialog with final results (optional but nice)
@@ -358,7 +428,7 @@ public class ClientGUI extends JFrame {
                 JOptionPane.showMessageDialog(
                         this,
                         finalResults,
-                        "🏆 Game Over - Final Results 🏆",
+                        " Game Over - Final Results ",
                         JOptionPane.INFORMATION_MESSAGE
                 );
             } catch (InterruptedException e) {
@@ -367,71 +437,5 @@ public class ClientGUI extends JFrame {
         }).start();
     }
 
-    public static void main(String[] args) throws InterruptedException {
-        ClientGUI gui = new ClientGUI();
-
-        // Test sequence
-        Thread.sleep(2000);
-
-        // Question 1
-        System.out.println("Question 1...");
-        String[] options1 = {
-                "Processo",
-                "Aplicação",
-                "Programa",
-                "Processo Ligeiro"
-        };
-        gui.displayQuestion("O que é uma thread?", options1, 30);
-
-        // Update scoreboard during question
-        Thread.sleep(2000);
-        gui.displayScoreboard(
-                "Rank  Team           Points\n" +
-                        "==============================\n" +
-                        "  1.  Team Alpha      100\n" +
-                        "  2.  Team Beta        80\n" +
-                        "  3.  Team Gamma       60\n" +
-                        "  4.  Team Delta       40\n"
-        );
-
-        // Wait for timer or answer
-        Thread.sleep(16000);
-
-        // Question 2
-        System.out.println("Question 2...");
-        gui.resetForNextQuestion();
-        Thread.sleep(1000);
-
-        String[] options2 = {
-                "join()",
-                "sleep()",
-                "interrupted()",
-                "wait()"
-        };
-        gui.displayQuestion("Qual NÃO é bloqueante?", options2, 30);
-
-        // Update scoreboard
-        Thread.sleep(2000);
-        gui.displayScoreboard(
-                "Rank  Team           Points\n" +
-                        "==============================\n" +
-                        "  1.  Team Alpha      250\n" +
-                        "  2.  Team Beta       200\n" +
-                        "  3.  Team Gamma      150\n" +
-                        "  4.  Team Delta      100\n"
-        );
-
-        Thread.sleep(16000);
-
-        // Show final results
-        System.out.println("Game ending...");
-        gui.showGameEnded(
-                "🥇 1st: Team Alpha - 450 pts\n" +
-                        "🥈 2nd: Team Beta - 380 pts\n" +
-                        "🥉 3rd: Team Gamma - 320 pts\n" +
-                        "4th: Team Delta - 280 pts\n\n" +
-                        "Congratulations to all teams!"
-        );
-    }
 }
 

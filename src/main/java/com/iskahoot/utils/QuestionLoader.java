@@ -1,19 +1,20 @@
 package com.iskahoot.utils;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.iskahoot.common.models.Quiz;
+import com.google.gson.reflect.TypeToken;
+import com.google.gson.stream.JsonReader;
+import com.iskahoot.common.models.Question;
+//import com.iskahoot.common.models.Quiz;
 
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.*;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Utility class to load questions from JSON file using Gson
  */
-//public class QuestionLoader {
+public class QuestionLoader {
 //    private static final Gson gson = new Gson();
 //
 //    /**
@@ -50,5 +51,30 @@ import java.io.Reader;
 //            return gson.fromJson(quizzesObject, Quiz.class);
 //        }
 //    }
+    public List<Question> loadFromFile(String filePath) throws IOException {
+        Gson gson = new Gson();
+        JsonReader jsonReader;
+            try {
+                jsonReader = readDataFromFile(filePath);
+                Type questionListType = new TypeToken<ArrayList<Question>>() {
+                }.getType();
+
+                ArrayList<Question> questions = gson.fromJson(jsonReader, questionListType);
+
+                System.out.println(questions);
+                return questions;
+
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        return null;
+    }
+
+
+    private static JsonReader readDataFromFile (String fileName) throws FileNotFoundException {
+        return new JsonReader(new FileReader(fileName));
+    }
+}
+
 //}
 

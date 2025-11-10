@@ -1,6 +1,6 @@
 package com.iskahoot.client;
 
-import com.iskahoot.common.messages.*;
+//import com.iskahoot.common.messages.*;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;

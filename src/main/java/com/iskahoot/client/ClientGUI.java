@@ -6,7 +6,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -15,6 +14,14 @@ import java.util.List;
  */
 public class ClientGUI extends JFrame {
     //private Client client;
+
+    public interface AnswerCallback {
+        void onAnswerSelected(int questionIndex, int answerIndex);
+    }
+
+    public interface NextQuestionCallback {
+        void onNextQuestion(int newQuestionIndex);
+    }
 
     private JLabel questionLabel;
     private JButton[] optionButtons;
@@ -32,6 +39,9 @@ public class ClientGUI extends JFrame {
 
     private List<Question> questions;
     private int currentQuestionIndex = 0;
+
+    private AnswerCallback answerCallback;
+    private NextQuestionCallback nextQuestionCallback;
 
 //    public ClientGUI(Client client) {
 //        this.client = client;
@@ -54,6 +64,44 @@ public class ClientGUI extends JFrame {
         }
     }
 
+    public void setAnswerCallback(AnswerCallback callback) {
+        this.answerCallback = callback;
+    }
+
+    public void setNextQuestionCallback(NextQuestionCallback callback) {
+        this.nextQuestionCallback = callback;
+    }
+    // Stub so para testar a implementação do scoreboard temporario
+    public void updateScoreboard(com.iskahoot.common.messages.ScoreboardData scoreboard) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("═══════════════════════════\n");
+        sb.append("    ROUND ").append(scoreboard.getCurrentRound())
+          .append("/").append(scoreboard.getTotalRounds()).append("\n");
+        sb.append("═══════════════════════════\n\n");
+
+        sb.append("🏆 TEAM STANDINGS:\n");
+        sb.append("───────────────────────────\n");
+
+        scoreboard.getTeamScores().forEach((team, score) -> {
+            sb.append(String.format("%-10s %4d pts\n", team, score));
+        });
+
+        displayScoreboard(sb.toString());
+    }
+    // Stub so para testar a implementação do scoreboard temporario
+    public void updateInitialScoreboard(int totalQuestions) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("═══════════════════════════\n");
+        sb.append("    ROUND 1/").append(totalQuestions).append("\n");
+        sb.append("═══════════════════════════\n\n");
+
+        sb.append("🏆 TEAM STANDINGS:\n");
+        sb.append("───────────────────────────\n");
+        sb.append("TEAM1        0 pts\n");
+
+        displayScoreboard(sb.toString());
+    }
+
     public void showNextQuestion() {
         if (currentQuestionIndex < questions.size()) {
             Question q = questions.get(currentQuestionIndex);
@@ -70,6 +118,9 @@ public class ClientGUI extends JFrame {
     public void nextQuestion() {
         currentQuestionIndex++;
         if (currentQuestionIndex < questions.size()) {
+            if (nextQuestionCallback != null) {
+                nextQuestionCallback.onNextQuestion(currentQuestionIndex);
+            }
             resetForNextQuestion();
             showNextQuestion();
         } else {
@@ -87,11 +138,6 @@ public class ClientGUI extends JFrame {
         mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         mainPanel.setBackground(new Color(46, 49, 146));
 
-        // TODO: Phase 1 - Implement GUI components
-        // - Question display area ///
-        // - Answer buttons ///
-        // - Timer display ///
-        // - Scoreboard panel ///
 
         timerPanel = displayTimerPanel();
         mainPanel.add(timerPanel, BorderLayout.NORTH);
@@ -246,9 +292,7 @@ public class ClientGUI extends JFrame {
         return panel;
     }
 
-    /**
-     * Display a question with options
-     */
+
     public void displayQuestion(String questionText, String[] options, int timeLimit) {
         // garantir execução na Event Dispatch Thread (conceito fundamental de Swing)
         SwingUtilities.invokeLater(() -> {
@@ -291,9 +335,7 @@ public class ClientGUI extends JFrame {
         });
     }
 
-    /**
-     * Handle option selection
-     */
+
     private void selectOption(int optionIndex) {
         if (!waitingForAnswer) return;
 
@@ -314,12 +356,11 @@ public class ClientGUI extends JFrame {
             optionButtons[i].setEnabled(false);
         }
 
-        // Notify client about the selection
-//        if (client != null) {
-//            // client.sendAnswer(optionIndex);
-//        }
-
         System.out.println("Selected option: " + optionIndex);
+
+        if (answerCallback != null) {
+            answerCallback.onAnswerSelected(currentQuestionIndex, optionIndex);
+        }
     }
 
     /**
@@ -348,17 +389,6 @@ public class ClientGUI extends JFrame {
         return selectedOption;
     }
 
-//    /**
-//     * Set client reference
-//     */
-//    public void setClient(Client client) { ????????????
-//        this.client = client;
-//    }
-
-
-    /**
-     * Create scoreboard panel
-     */
     private JPanel createScoreboardPanel() {
         JPanel panel = new JPanel(new BorderLayout(5, 5));
         panel.setBackground(Color.WHITE);
@@ -421,7 +451,7 @@ public class ClientGUI extends JFrame {
         scoreboardArea.setText(" FINAL RESULTS \n\n" + finalResults);
         scoreboardArea.setCaretPosition(0);
 
-        // Show dialog with final results (optional but nice)
+        // Show dialog with final results
         new Thread(() -> {
             try {
                 Thread.sleep(500); // Small delay for visual effect

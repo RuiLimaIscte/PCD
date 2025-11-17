@@ -6,13 +6,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import java.util.List;
 
-/**
- * GUI for the client application
- * TODO: Implement in Phase 1
- */
 public class ClientGUI extends JFrame {
     //private Client client;
 
@@ -25,7 +20,7 @@ public class ClientGUI extends JFrame {
     private int BEGINTIME=30;
     private int currentTime;
     private Thread timerThread;
-    private volatile boolean timerRunning;
+    private boolean timerRunning;
 
     private int selectedOption = -1;
     private boolean waitingForAnswer = false;
@@ -33,14 +28,6 @@ public class ClientGUI extends JFrame {
     private List<Question> questions;
     private int currentQuestionIndex = 0;
 
-//    public ClientGUI(Client client) {
-//        this.client = client;
-//        initializeGUI();
-//    }
-
-    public ClientGUI() {
-        initializeGUI();
-    }
 
     public ClientGUI(List<Question> questions) {
         this.questions = questions;
@@ -54,6 +41,20 @@ public class ClientGUI extends JFrame {
         }
     }
 
+    // Stub so para testar a implementação do scoreboard temporario
+    public void updateInitialScoreboard(int totalQuestions) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("═══════════════════════════\n");
+        sb.append("    ROUND 1/").append(totalQuestions).append("\n");
+        sb.append("═══════════════════════════\n\n");
+
+        sb.append("TEAM STANDINGS:\n");
+        sb.append("───────────────────────────\n");
+        sb.append("TEAM1        0 pts\n");
+
+        displayScoreboard(sb.toString());
+    }
+
     public void showNextQuestion() {
         if (currentQuestionIndex < questions.size()) {
             Question q = questions.get(currentQuestionIndex);
@@ -64,9 +65,6 @@ public class ClientGUI extends JFrame {
         }
     }
 
-    /**
-     * Avança para a próxima questão
-     */
     public void nextQuestion() {
         currentQuestionIndex++;
         if (currentQuestionIndex < questions.size()) {
@@ -87,11 +85,6 @@ public class ClientGUI extends JFrame {
         mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         mainPanel.setBackground(new Color(46, 49, 146));
 
-        // TODO: Phase 1 - Implement GUI components
-        // - Question display area ///
-        // - Answer buttons ///
-        // - Timer display ///
-        // - Scoreboard panel ///
 
         timerPanel = displayTimerPanel();
         mainPanel.add(timerPanel, BorderLayout.NORTH);
@@ -126,6 +119,8 @@ public class ClientGUI extends JFrame {
 
         add(mainPanel);
         setVisible(true);
+
+
     }
 
     private JPanel displayTimerPanel() {
@@ -144,7 +139,7 @@ public class ClientGUI extends JFrame {
     public void updateTimer(int secondsRemaining) {
         timerLabel.setText(String.valueOf(secondsRemaining));
 
-        // Change color based on time remaining
+
         if (secondsRemaining <= 5) {
             timerLabel.setForeground(new Color(230, 46, 73)); // Red
         } else if (secondsRemaining <= 10) {
@@ -154,11 +149,7 @@ public class ClientGUI extends JFrame {
         }
     }
 
-    /**
-     * Start the countdown timer
-     */
     public void startTimer(int seconds) {
-        // Stop any existing timer
         stopTimer();
 
         currentTime = seconds;
@@ -185,9 +176,6 @@ public class ClientGUI extends JFrame {
         timerThread.start();
     }
 
-    /**
-     * Stop the countdown timer
-     */
     public void stopTimer() {
         timerRunning = false;
         if (timerThread != null) {
@@ -214,12 +202,11 @@ public class ClientGUI extends JFrame {
         panel.setOpaque(false);
         panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // Colors for Kahoot-style buttons
         Color[] colors = {
-                new Color(230, 46, 73),   // Red
-                new Color(19, 104, 206),  // Blue
-                new Color(255, 161, 23),  // Orange
-                new Color(38, 137, 12)    // Green
+                new Color(230, 46, 73),
+                new Color(19, 104, 206),
+                new Color(255, 161, 23),
+                new Color(38, 137, 12)
         };
 
         optionButtons = new JButton[4];
@@ -246,16 +233,11 @@ public class ClientGUI extends JFrame {
         return panel;
     }
 
-    /**
-     * Display a question with options
-     */
+
     public void displayQuestion(String questionText, String[] options, int timeLimit) {
-        // garantir execução na Event Dispatch Thread (conceito fundamental de Swing)
         SwingUtilities.invokeLater(() -> {
-            // Atualizar o texto da pergunta
             questionLabel.setText(questionText);
 
-            // Atualizar as opções
             for (int i = 0; i < optionButtons.length; i++) {
                 if (i < options.length) {
                     optionButtons[i].setText(options[i]);
@@ -265,12 +247,10 @@ public class ClientGUI extends JFrame {
                     optionButtons[i].setVisible(false);
                 }
 
-                // Remover qualquer listener antigo
                 for (ActionListener al : optionButtons[i].getActionListeners()) {
                     optionButtons[i].removeActionListener(al);
                 }
 
-                // Adicionar ActionListener
                 final int optionIndex = i;
                 optionButtons[i].addActionListener(new ActionListener() {
                     @Override
@@ -282,28 +262,22 @@ public class ClientGUI extends JFrame {
                 });
             }
 
-            // Preparar estado do jogo
             selectedOption = -1;
             waitingForAnswer = true;
 
-            // Iniciar temporizador (thread separada)
             startTimer(timeLimit);
         });
     }
 
-    /**
-     * Handle option selection
-     */
+
     private void selectOption(int optionIndex) {
         if (!waitingForAnswer) return;
 
         selectedOption = optionIndex;
         waitingForAnswer = false;
 
-        // Stop timer when answer is selected
         stopTimer();
 
-        // Highlight selected button
         for (int i = 0; i < optionButtons.length; i++) {
             if (i == optionIndex) {
                 optionButtons[i].setBorder(BorderFactory.createCompoundBorder(
@@ -314,12 +288,8 @@ public class ClientGUI extends JFrame {
             optionButtons[i].setEnabled(false);
         }
 
-        // Notify client about the selection
-//        if (client != null) {
-//            // client.sendAnswer(optionIndex);
-//        }
-
         System.out.println("Selected option: " + optionIndex);
+
     }
 
     /**
@@ -348,17 +318,6 @@ public class ClientGUI extends JFrame {
         return selectedOption;
     }
 
-//    /**
-//     * Set client reference
-//     */
-//    public void setClient(Client client) { ????????????
-//        this.client = client;
-//    }
-
-
-    /**
-     * Create scoreboard panel
-     */
     private JPanel createScoreboardPanel() {
         JPanel panel = new JPanel(new BorderLayout(5, 5));
         panel.setBackground(Color.WHITE);
@@ -402,29 +361,21 @@ public class ClientGUI extends JFrame {
     public void showGameEnded(String finalResults) {
         stopTimer();
 
-        // Update question label
-        questionLabel.setText("<html><div style='text-align: center; color: #2e3192;'>" +
-                "<h1> Game Over! </h1></div></html>");
-
-        // Disable all buttons
         for (JButton button : optionButtons) {
             button.setEnabled(false);
             button.setText("");
             button.setVisible(false);
         }
 
-        // Reset timer display
         timerLabel.setText("--");
         timerLabel.setForeground(Color.WHITE);
 
-        // Show final results in scoreboard
         scoreboardArea.setText(" FINAL RESULTS \n\n" + finalResults);
         scoreboardArea.setCaretPosition(0);
 
-        // Show dialog with final results (optional but nice)
         new Thread(() -> {
             try {
-                Thread.sleep(500); // Small delay for visual effect
+                Thread.sleep(500);
                 JOptionPane.showMessageDialog(
                         this,
                         finalResults,

@@ -361,6 +361,8 @@ public class ClientGUI extends JFrame {
     public void showGameEnded(String finalResults) {
         stopTimer();
 
+        questionLabel.setText("GAME OVER!");
+
         for (JButton button : optionButtons) {
             button.setEnabled(false);
             button.setText("");
@@ -373,19 +375,19 @@ public class ClientGUI extends JFrame {
         scoreboardArea.setText(" FINAL RESULTS \n\n" + finalResults);
         scoreboardArea.setCaretPosition(0);
 
-        new Thread(() -> {
-            try {
-                Thread.sleep(500);
-                JOptionPane.showMessageDialog(
-                        this,
-                        finalResults,
-                        " Game Over - Final Results ",
-                        JOptionPane.INFORMATION_MESSAGE
-                );
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }).start();
+//        new Thread(() -> {
+//            try {
+//                Thread.sleep(500);
+//                JOptionPane.showMessageDialog(
+//                        this,
+//                        finalResults,
+//                        " Game Over - Final Results ",
+//                        JOptionPane.INFORMATION_MESSAGE
+//                );
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//        }).start();
     }
 
 }

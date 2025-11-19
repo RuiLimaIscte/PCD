@@ -29,6 +29,7 @@ public class Player implements Serializable {
     public String getTeamCode() {
         return teamCode;
     }
+
     public void addScore(int points) {
         this.individualScore += points;
     }

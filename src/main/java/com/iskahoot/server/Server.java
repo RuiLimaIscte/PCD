@@ -9,8 +9,8 @@ public class Server {
 
     public static final int PORTO = 8080;
     private ServerSocket serverSocket;
-    private BufferedReader in ;
-    private PrintWriter out ;
+//    private BufferedReader in ;
+//    private PrintWriter out ;
 
     public static void main ( String [] args ) {
         try {

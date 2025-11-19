@@ -1,6 +1,7 @@
 package com.iskahoot.client;
 
 import com.iskahoot.common.models.Question;
+import com.iskahoot.common.models.Quiz;
 
 import javax.swing.*;
 import java.awt.*;
@@ -30,7 +31,10 @@ public class SimpleClientGUI extends JFrame {
 
 
     public static void main(String[] args) throws IOException {
-        new SimpleClientGUI(loadFromFile("src/main/resources/questions.json"), "Player1");
+        Quiz quiz = new Quiz(loadFromFile("src/main/resources/questions.json").getName(),
+                loadFromFile("src/main/resources/questions.json").getQuestions());
+
+        new SimpleClientGUI(quiz.getQuestions(), "Client 1");
     }
 
     public SimpleClientGUI(List<Question> questions, String clientInfo) {

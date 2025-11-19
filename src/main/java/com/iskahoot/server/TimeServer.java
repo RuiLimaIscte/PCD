@@ -80,7 +80,7 @@ public class TimeServer {
         private final Socket socket;
         private ObjectOutputStream out;
         private ObjectInputStream in;
-        private volatile boolean confirmed;
+        private boolean confirmed;
 
         public ClientHandler(Socket socket) {
             this.socket = socket;

@@ -3,18 +3,15 @@ package com.iskahoot.server;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Scanner;
-
+//TODO Guardar referencia a todos os clients ligados
 public class Server {
 
     public static final int PORTO = 8080;
     private ServerSocket serverSocket;
-//    private BufferedReader in ;
-//    private PrintWriter out ;
 
     public static void main ( String [] args ) {
         try {
-            new Server (). startServing ();
+            new Server().startServing ();
         } catch ( IOException e ) {
 // ...
         }
@@ -25,10 +22,13 @@ public class Server {
         try {
             serverSocket = new ServerSocket ( PORTO );
             while ( true ) {
-                WaitConnections();
+                //wait for a connection
+                Socket socket = serverSocket.accept();
+                DealWithClient handler = new DealWithClient(socket);
+                handler.start();
             }
         } catch ( IOException e ) {
-            e . printStackTrace ();
+            e.printStackTrace ();
         } finally {
             if(serverSocket != null) {
                 try {
@@ -39,10 +39,10 @@ public class Server {
             }
         }
     }
-    void WaitConnections () throws IOException {
-        Socket connection = serverSocket.accept(); // Wait for connection at port
-        ConnectionHandler handler = new ConnectionHandler(connection);
-        handler.start();
-    }
+//    void WaitConnections () throws IOException {
+//        Socket connection = serverSocket.accept();
+//        ConnectionHandler handler = new ConnectionHandler(connection);
+//        handler.start();
+//    }
 
 }

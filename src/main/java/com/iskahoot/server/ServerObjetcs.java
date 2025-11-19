@@ -3,7 +3,6 @@ package com.iskahoot.server;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Scanner;
 
 public class ServerObjetcs {
 
@@ -41,7 +40,7 @@ public class ServerObjetcs {
     }
     void WaitConnections () throws IOException {
         Socket connection = serverSocket.accept(); // Wait for connection at port
-        ConnectionHandlerObjects handler = new ConnectionHandlerObjects(connection);
+        DealWithClientObjects handler = new DealWithClientObjects(connection);
         handler.start();
     }
 

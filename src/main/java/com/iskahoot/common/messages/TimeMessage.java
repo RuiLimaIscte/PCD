@@ -5,7 +5,7 @@ import java.io.Serializable;
 public class TimeMessage implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private long currentTimeMillis;
+    private long currentTimeMillis; //TODO usar timesatmp
 
     public TimeMessage(long currentTimeMillis) {
         this.currentTimeMillis = currentTimeMillis;

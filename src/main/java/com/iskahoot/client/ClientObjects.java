@@ -1,5 +1,6 @@
 package com.iskahoot.client;
 
+import com.iskahoot.common.messages.Mensagem;
 import com.iskahoot.common.messages.ReceptionConfirmationMessage;
 import com.iskahoot.common.messages.TimeMessage;
 import com.iskahoot.server.Server;
@@ -21,8 +22,8 @@ public class ClientObjects {
         try {
             connectToServer();
             setStreams();
-//            sendMessages();
-        } catch (IOException e) {// ERRO ...
+            sendMessages();
+        } catch (IOException | ClassNotFoundException e) {// ERRO ...
             e . printStackTrace ();
         } finally {// a fechar ...
             closeCon();
@@ -49,24 +50,26 @@ public class ClientObjects {
         System.out.println("socket: " + socket);
     }
 
-//    void sendMessages () throws IOException {
-//        for (int i = 0; i < 10; i ++) {
-//            out.println ( " Ola " + i );
-//            String str = in.readLine();
-//            System.out.println ( str );
-//            try {
-//                Thread.sleep ( 3000 );
-//            } catch ( InterruptedException e ) {
-//                e . printStackTrace ();
-//            }
-//        }
-//        out.println ( " FIM " );
-//    }
+    void sendMessages () throws IOException, ClassNotFoundException {
+        for (int i = 0; i < 10; i ++) {
+            Mensagem message= new Mensagem(i,"ola");
+            out.writeObject(message);
+            Mensagem str = (Mensagem)in.readObject();
+            System.out.println ( str );
+            try {
+                Thread.sleep ( 3000 );
+            } catch ( InterruptedException e ) {
+                e . printStackTrace ();
+            }
+        }
+        out.writeObject(new Mensagem(-1,"FIM"));
+    }
 
     private void setStreams() throws IOException {
+        in = new ObjectInputStream(socket.getInputStream());
         out = new ObjectOutputStream(socket.getOutputStream());
         out.flush();
-        in = new ObjectInputStream(socket.getInputStream());
+
     }
 
 

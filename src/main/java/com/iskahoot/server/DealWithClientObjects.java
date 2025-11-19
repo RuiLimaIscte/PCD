@@ -6,12 +6,12 @@ import com.iskahoot.common.messages.TimeMessage;
 import java.io.*;
 import java.net.Socket;
 
-public class ConnectionHandlerObjects extends Thread {
+public class DealWithClientObjects extends Thread {
     private Socket connection;
     private ObjectInputStream in;
     private ObjectOutputStream out;
 
-    public ConnectionHandlerObjects(Socket connection) {
+    public DealWithClientObjects(Socket connection) {
         this.connection = connection;
     }
 
@@ -29,7 +29,7 @@ public class ConnectionHandlerObjects extends Thread {
 
     private void setStreams() throws IOException {
         out = new ObjectOutputStream(connection.getOutputStream());
-        out.flush(); // necessário para inicializar corretamente o ObjectInputStream no cliente
+        out.flush();
         in = new ObjectInputStream(connection.getInputStream());
     }
 

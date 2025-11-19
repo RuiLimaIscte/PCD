@@ -1,5 +1,7 @@
 package com.iskahoot.client;
 
+import com.iskahoot.common.messages.ReceptionConfirmationMessage;
+import com.iskahoot.common.messages.TimeMessage;
 import com.iskahoot.server.Server;
 
 import java.io.*;
@@ -8,19 +10,20 @@ import java.net.Socket;
 import java.util.Scanner;
 
 public class ClientObjects {
-    private BufferedReader  in ;   //TODO mudar para ObjectInputStream
-    private PrintWriter out ;   //TODO mudar para ObjectOutputStream
+    private ObjectInputStream in;
+    private ObjectOutputStream out;
     private Socket socket ;
 
     public static void main ( String [] args ) {
-        new Client (). runClient ();
+        new ClientObjects (). runClient ();
     }
     public void runClient () {
         try {
             connectToServer();
             setStreams();
-            sendMessages();
+//            sendMessages();
         } catch (IOException e) {// ERRO ...
+            e . printStackTrace ();
         } finally {// a fechar ...
             closeCon();
         }
@@ -46,23 +49,24 @@ public class ClientObjects {
         System.out.println("socket: " + socket);
     }
 
-    void sendMessages () throws IOException {
-        for (int i = 0; i < 10; i ++) {
-            out.println ( " Ola " + i );
-            String str = in.readLine();
-            System.out.println ( str );
-            try {
-                Thread.sleep ( 3000 );
-            } catch ( InterruptedException e ) {
-                e . printStackTrace ();
-            }
-        }
-        out.println ( " FIM " );
-    }
+//    void sendMessages () throws IOException {
+//        for (int i = 0; i < 10; i ++) {
+//            out.println ( " Ola " + i );
+//            String str = in.readLine();
+//            System.out.println ( str );
+//            try {
+//                Thread.sleep ( 3000 );
+//            } catch ( InterruptedException e ) {
+//                e . printStackTrace ();
+//            }
+//        }
+//        out.println ( " FIM " );
+//    }
 
     private void setStreams() throws IOException {
-        out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true); //TODO mudar para ObjectOutputStream
-        in = new BufferedReader ( new InputStreamReader(socket.getInputStream())); //TODO mudar para ObjectInputStream
+        out = new ObjectOutputStream(socket.getOutputStream());
+        out.flush();
+        in = new ObjectInputStream(socket.getInputStream());
     }
 
 

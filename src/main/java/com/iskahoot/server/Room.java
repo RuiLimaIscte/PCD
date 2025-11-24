@@ -69,7 +69,7 @@ public class Room {
         }
 
         state = RoomState.PLAYING;
-        gameState = new GameState(this, quiz);
+        gameState = new GameState(this);
 
         System.out.println("Game starting in room: " + roomCode);
     }
@@ -110,5 +110,8 @@ public class Room {
         return teams.containsKey(teamCode);
     }
 
+    public Quiz getQuiz() {
+        return quiz;
+    }
 }
 

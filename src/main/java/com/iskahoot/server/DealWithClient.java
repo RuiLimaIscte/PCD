@@ -1,14 +1,14 @@
 package com.iskahoot.server;
 
 import com.iskahoot.common.messages.Mensagem;
+import com.iskahoot.common.messages.ReceptionConfirmationMessage;
+import com.iskahoot.common.messages.TimeMessage;
 
 import java.io.*;
 import java.net.Socket;
 
 public class DealWithClient extends Thread {
     private Socket connection;
-//    private BufferedReader in; //TODO mudar para ObjectInputStream
-//    private PrintWriter out;//TODO mudar para ObjectOutputStream
     private ObjectInputStream in;
     private ObjectOutputStream out;
 
@@ -20,8 +20,9 @@ public class DealWithClient extends Thread {
     public void run() {
         try {
             setStreams();
+            sendTime();
             serve();
-        } catch (IOException e) {
+        } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         } finally {
             closeConnection();
@@ -43,8 +44,6 @@ public class DealWithClient extends Thread {
     }
 
     private void setStreams() throws IOException {
-//        out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(connection.getOutputStream())), true); //TODO mudar para ObjectOutputStream
-//        in = new BufferedReader( new InputStreamReader (connection.getInputStream())); //TODO mudar para ObjectInputStream
         out = new ObjectOutputStream(connection.getOutputStream());
         out.flush();
         in = new ObjectInputStream(connection.getInputStream());
@@ -52,17 +51,38 @@ public class DealWithClient extends Thread {
 
     private void serve() throws IOException {
         while (true) {
-            Mensagem str;
+            Object obj;
             try {
-                str = (Mensagem) in.readObject();
-                if (str.getMessage().equals("FIM"))
+                obj = in.readObject();
+                if (((Mensagem) obj).getMessage().equals("FIM"))
                     break;
-                System.out.println("Eco: " + str.getMessage() + " id: " + str.getId());
-                out.writeObject(str);
+                System.out.println("Eco: " + ((Mensagem) obj).getMessage() + " id: " + ((Mensagem) obj).getId());
+                out.writeObject(obj);
             } catch (IOException | ClassNotFoundException e) {
 
             }
         }
+    }
+
+    void sendTime() throws IOException, ClassNotFoundException {
+        TimeMessage timeMessage = new TimeMessage(System.currentTimeMillis());
+        out.writeObject(timeMessage);
+        ReceptionConfirmationMessage confirmation = (ReceptionConfirmationMessage) in.readObject();
+        System.out.println("Confirmação recebida do cliente: " + confirmation.getReceivedAtMillis());
+
+
+//        for (int i = 0; i < 10; i ++) {
+//            Mensagem message= new Mensagem(i,"ola");
+//            out.writeObject(message);
+//            Mensagem str = (Mensagem)in.readObject();
+//            System.out.println ( str );
+//            try {
+//                Thread.sleep ( 3000 );
+//            } catch ( InterruptedException e ) {
+//                e . printStackTrace ();
+//            }
+//        }
+//        out.writeObject(new Mensagem(-1,"FIM"));
     }
 
 

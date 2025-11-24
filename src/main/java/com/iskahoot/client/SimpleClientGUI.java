@@ -15,7 +15,7 @@ public class SimpleClientGUI extends JFrame {
 
     private JLabel questionLabel;
     private JButton[] optionButtons;
-    private JLabel timerLabel;
+    private static JLabel timerLabel;
     private JTextArea scoreboardArea;
 
     private List<Question> questions;
@@ -114,47 +114,54 @@ public class SimpleClientGUI extends JFrame {
             optionButtons[i].setEnabled(true);
         }
 
-        startTimer(30);
+//        startTimer(30);
+        updateTimerLabel(30);
     }
 
-    // -----------------------------------------
-    //              TIMER
-    // -----------------------------------------
-    private void startTimer(int seconds) {
-
-        if (swingTimer != null) {
-            swingTimer.stop();
-        }
-
-        timeLeft = seconds;
+    public static void updateTimerLabel(long timeLeft) {
+        if (timeLeft < 0) timeLeft = 0;
         timerLabel.setText("Timer: " + timeLeft);
-
-        swingTimer = new Timer(1000, e -> {
-            timeLeft--;
-            timerLabel.setText("Timer: " + timeLeft);
-
-            if (timeLeft <= 0) {
-                swingTimer.stop();
-                timesUp();
-            }
-        });
-
-        swingTimer.start();
     }
 
-    private void stopTimer() {
-        if (swingTimer != null) swingTimer.stop();
-    }
 
-    private void timesUp() {
-        waitingForAnswer = false;
+//    // -----------------------------------------
+//    //              TIMER
+//    // -----------------------------------------
+//    private void startTimer(int seconds) {
+//
+//        if (swingTimer != null) {
+//            swingTimer.stop();
+//        }
+//
+//        timeLeft = seconds;
+//        timerLabel.setText("Timer: " + timeLeft);
+//
+//        swingTimer = new Timer(1000, e -> {
+//            timeLeft--;
+//            timerLabel.setText("Timer: " + timeLeft);
+//
+//            if (timeLeft <= 0) {
+//                swingTimer.stop();
+//                timesUp();
+//            }
+//        });
+//
+//        swingTimer.start();
+//    }
 
-        for (JButton b : optionButtons)
-            b.setEnabled(false);
-
-        JOptionPane.showMessageDialog(this, "Tempo esgotado!");
-        nextQuestion();
-    }
+//    private void stopTimer() {
+//        if (swingTimer != null) swingTimer.stop();
+//    }
+//
+//    private void timesUp() {
+//        waitingForAnswer = false;
+//
+//        for (JButton b : optionButtons)
+//            b.setEnabled(false);
+//
+//        JOptionPane.showMessageDialog(this, "Tempo esgotado!");
+//        nextQuestion();
+//    }
 
     // -----------------------------------------
     //        HANDLE OPTION SELECTION
@@ -165,7 +172,7 @@ public class SimpleClientGUI extends JFrame {
 
         selectedOption = index;
         waitingForAnswer = false;
-        stopTimer();
+//        stopTimer();
 
         for (int i = 0; i < 4; i++) {
             optionButtons[i].setEnabled(false);
@@ -203,7 +210,7 @@ public class SimpleClientGUI extends JFrame {
     // -----------------------------------------
     private void showGameEnded() {
 
-        stopTimer();
+//        stopTimer();
 
         questionLabel.setText("GAME OVER");
         for (JButton b : optionButtons) {

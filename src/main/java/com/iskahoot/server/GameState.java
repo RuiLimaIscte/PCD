@@ -12,7 +12,6 @@ import java.util.Map;
 
 public class GameState {
     private final Room room;
-    private final Quiz quiz;
     private final List<Question> questions;
     private ScoreboardData lastScoreboard; //cache do ultimo scoreboard
     private int currentQuestionIndex;
@@ -25,10 +24,9 @@ public class GameState {
     //private final java.util.List<String> answerOrder = new java.util.ArrayList<>();             no entanto pode vir a dar jeito
 
 
-    public GameState(Room room, Quiz quiz) {
+    public GameState(Room room) {
         this.room = room;
-        this.quiz = quiz;
-        this.questions = quiz.getQuestions();
+        this.questions = room.getQuiz().getQuestions();
         this.currentQuestionIndex = -1;
         this.roundActive = false;
     }

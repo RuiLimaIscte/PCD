@@ -39,6 +39,11 @@ public class Server {
                 DealWithClient handler = new DealWithClient(socket);
                 clients.add(handler);
                 handler.start();
+
+                // ADICIONAR ISTO PARA TESTAR O TEMPO:
+//                if (clients.size() == 1) { // Apenas para teste, arranca com 1 jogador
+//                    new GameSession(clients).start();
+//                }
             }
         } catch ( IOException e ) {
             e.printStackTrace ();

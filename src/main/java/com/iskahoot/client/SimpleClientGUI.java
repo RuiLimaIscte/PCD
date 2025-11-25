@@ -24,8 +24,6 @@ public class SimpleClientGUI extends JFrame {
     private int selectedOption = -1;
     private boolean waitingForAnswer = false;
 
-    private Timer swingTimer;
-    private int timeLeft;
 
     private String clientInfo;
 
@@ -113,9 +111,8 @@ public class SimpleClientGUI extends JFrame {
             optionButtons[i].setText(q.getOptions().get(i));
             optionButtons[i].setEnabled(true);
         }
-
-//        startTimer(30);
-        updateTimerLabel(30);
+        //        startTimer(30);
+        //   updateTimerLabel(30);
     }
 
     public static void updateTimerLabel(long timeLeft) {

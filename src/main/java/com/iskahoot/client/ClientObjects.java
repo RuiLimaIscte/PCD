@@ -18,20 +18,64 @@ public class ClientObjects {
     private ObjectOutputStream out;
     private Socket socket ;
     private long displayedTime;
+    private SimpleClientGUI clientGUI ;
+
 
     public static void main ( String [] args ) {
         new ClientObjects (). runClient ();
     }
+
     public void runClient () {
         try {
             connectToServer();
             setStreams();
-            sendConfirmation();
-        } catch (IOException | ClassNotFoundException e) {// ERRO ...
+            waitmensages();
+
+        } catch (IOException e) {// ERRO ...
             e . printStackTrace ();
         } finally {// a fechar ...
             closeCon();
         }
+    }
+
+    private void waitmensages() {
+        while (true) {
+            try {
+                Object obj = in.readObject();
+                if (obj instanceof TimeMessage) {
+                    TimeMessage timeMessage = (TimeMessage) obj;
+                    long serverTime = timeMessage.getCurrentTimeMillis();
+                    System.out.println("Hora do servidor: " + serverTime);
+                    sendConfirmation();
+
+                    //TODO  mudar isto para receber info do servidor e nao crirar um quiz no Client
+                    Quiz quiz = new Quiz(loadFromFile("src/main/resources/questions.json").getName(),
+                            loadFromFile("src/main/resources/questions.json").getQuestions());
+
+                    clientGUI = new SimpleClientGUI(quiz.getQuestions(), "Client 1");//TODO a thread nao vai funcionar bem assim, por a thread em while true talvez
+                    System.out.println(timeMessage.getTimeToEndRound());
+                    countdown((int) timeMessage.getTimeToEndRound());
+                    //TODO quando o countdown acabar, enviar resposta para o servidor
+                }
+            } catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void countdown(int seconds) {
+        for (int i = seconds; i >= 0; i--) {
+            System.out.println("Time left: " + i);
+            clientGUI.updateTimerLabel(i);
+            try {
+                Thread.sleep(1000); // espera 1 segundo
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                return;
+            }
+        }
+
+        System.out.println("Finished!");
     }
 
     private void closeCon() {
@@ -55,7 +99,6 @@ public class ClientObjects {
     }
 
     void sendConfirmation () throws IOException, ClassNotFoundException {
-        TimeMessage timeMessage = (TimeMessage) in.readObject();
         ReceptionConfirmationMessage receptionConfirmationMessage = new ReceptionConfirmationMessage(System.currentTimeMillis());
         out.writeObject(receptionConfirmationMessage);
         System.out.println("Confirmação enviada!");
@@ -63,11 +106,6 @@ public class ClientObjects {
 //        long clientReceivedAt = receptionConfirmationMessage.getReceivedAtMillis();
 //        long latency = clientReceivedAt - serverSentAt;
 //        displayedTime = serverSentAt - latency;
-        Quiz quiz = new Quiz(loadFromFile("src/main/resources/questions.json").getName(),
-                loadFromFile("src/main/resources/questions.json").getQuestions());
-
-        new SimpleClientGUI(quiz.getQuestions(), "Client 1");//TODO a thread nao vai funcionar bem assim, por
-        SimpleClientGUI.updateTimerLabel(30); // TODO a thread em while true talvez
 
         try {
                 Thread.sleep ( 3000 );

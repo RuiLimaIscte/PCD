@@ -54,10 +54,14 @@ public class DealWithClient extends Thread {
             Object obj;
             try {
                 obj = in.readObject();
-                if (((Mensagem) obj).getMessage().equals("FIM"))
-                    break;
-                System.out.println("Eco: " + ((Mensagem) obj).getMessage() + " id: " + ((Mensagem) obj).getId());
-                out.writeObject(obj);
+                if (obj instanceof ReceptionConfirmationMessage) {
+                    ReceptionConfirmationMessage confirmation = (ReceptionConfirmationMessage) obj;
+                    System.out.println("Confirmação recebida do cliente: " + confirmation.getReceivedAtMillis());
+                }
+//                if (((Mensagem) obj).getMessage().equals("FIM"))
+//                    break;
+//                System.out.println("Eco: " + ((Mensagem) obj).getMessage() + " id: " + ((Mensagem) obj).getId());
+//                out.writeObject(obj);
             } catch (IOException | ClassNotFoundException e) {
 
             }
@@ -65,10 +69,10 @@ public class DealWithClient extends Thread {
     }
 
     void sendTime() throws IOException, ClassNotFoundException {
-        TimeMessage timeMessage = new TimeMessage(System.currentTimeMillis());
+        TimeMessage timeMessage = new TimeMessage(System.currentTimeMillis(),5);
         out.writeObject(timeMessage);
-        ReceptionConfirmationMessage confirmation = (ReceptionConfirmationMessage) in.readObject();
-        System.out.println("Confirmação recebida do cliente: " + confirmation.getReceivedAtMillis());
+//        ReceptionConfirmationMessage confirmation = (ReceptionConfirmationMessage) in.readObject();
+//        System.out.println("Confirmação recebida do cliente: " + confirmation.getReceivedAtMillis());
 
 
 //        for (int i = 0; i < 10; i ++) {

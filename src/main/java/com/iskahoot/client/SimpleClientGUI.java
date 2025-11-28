@@ -21,8 +21,12 @@ public class SimpleClientGUI extends JFrame {
     private List<Question> questions;
     private int currentQuestion = 0;
 
+    public int getSelectedOption() {
+        return selectedOption;
+    }
+
     private int selectedOption = -1;
-    private boolean waitingForAnswer = false;
+   // private boolean waitingForAnswer = false;
 
 
     private String clientInfo;
@@ -102,7 +106,7 @@ public class SimpleClientGUI extends JFrame {
     // -----------------------------------------
     private void displayQuestion(Question q) {
 
-        waitingForAnswer = true;
+//        waitingForAnswer = true;
         selectedOption = -1;
 
         questionLabel.setText(q.getQuestion());
@@ -115,74 +119,37 @@ public class SimpleClientGUI extends JFrame {
         //   updateTimerLabel(30);
     }
 
+    //Timer update method
     public static void updateTimerLabel(long timeLeft) {
         if (timeLeft < 0) timeLeft = 0;
         timerLabel.setText("Timer: " + timeLeft);
     }
 
 
-//    // -----------------------------------------
-//    //              TIMER
-//    // -----------------------------------------
-//    private void startTimer(int seconds) {
-//
-//        if (swingTimer != null) {
-//            swingTimer.stop();
-//        }
-//
-//        timeLeft = seconds;
-//        timerLabel.setText("Timer: " + timeLeft);
-//
-//        swingTimer = new Timer(1000, e -> {
-//            timeLeft--;
-//            timerLabel.setText("Timer: " + timeLeft);
-//
-//            if (timeLeft <= 0) {
-//                swingTimer.stop();
-//                timesUp();
-//            }
-//        });
-//
-//        swingTimer.start();
-//    }
-
-//    private void stopTimer() {
-//        if (swingTimer != null) swingTimer.stop();
-//    }
-//
-//    private void timesUp() {
-//        waitingForAnswer = false;
-//
-//        for (JButton b : optionButtons)
-//            b.setEnabled(false);
-//
-//        JOptionPane.showMessageDialog(this, "Tempo esgotado!");
-//        nextQuestion();
-//    }
-
     // -----------------------------------------
     //        HANDLE OPTION SELECTION
     // -----------------------------------------
     private void handleOption(int index) {
 
-        if (!waitingForAnswer) return;
+//        if (!waitingForAnswer) return;
 
         selectedOption = index;
-        waitingForAnswer = false;
+//        waitingForAnswer = false;
 //        stopTimer();
 
         for (int i = 0; i < 4; i++) {
             optionButtons[i].setEnabled(false);
             if (i == index) {
-                optionButtons[i].setBackground(Color.YELLOW);
+                optionButtons[i].setBackground(Color.GREEN);
             }
         }
 
         System.out.println("Selected: " + index);
 
-        nextQuestion();
+        //nextQuestion();
     }
 
+    //TODO nao vai ser usado, o servidor vai dizer qual é e quando passar a pergunta
     // -----------------------------------------
     //          NEXT QUESTION
     // -----------------------------------------

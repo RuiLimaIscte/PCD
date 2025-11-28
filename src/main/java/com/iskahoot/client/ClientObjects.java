@@ -1,6 +1,6 @@
 package com.iskahoot.client;
 
-import com.iskahoot.common.messages.Mensagem;
+import com.iskahoot.common.messages.AnswerFromClient;
 import com.iskahoot.common.messages.ReceptionConfirmationMessage;
 import com.iskahoot.common.messages.TimeMessage;
 import com.iskahoot.common.models.Quiz;
@@ -9,7 +9,6 @@ import com.iskahoot.server.Server;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.util.Scanner;
 
 import static com.iskahoot.utils.QuestionLoader.loadFromFile;
 
@@ -17,7 +16,6 @@ public class ClientObjects {
     private ObjectInputStream in;
     private ObjectOutputStream out;
     private Socket socket ;
-    private long displayedTime;
     private SimpleClientGUI clientGUI ;
 
 
@@ -52,10 +50,11 @@ public class ClientObjects {
                     Quiz quiz = new Quiz(loadFromFile("src/main/resources/questions.json").getName(),
                             loadFromFile("src/main/resources/questions.json").getQuestions());
 
-                    clientGUI = new SimpleClientGUI(quiz.getQuestions(), "Client 1");//TODO a thread nao vai funcionar bem assim, por a thread em while true talvez
+                    clientGUI = new SimpleClientGUI(quiz.getQuestions(), "Client 1");
                     System.out.println(timeMessage.getTimeToEndRound());
-                    countdown((int) timeMessage.getTimeToEndRound());
+                    countdownInGUI((int) timeMessage.getTimeToEndRound());
                     //TODO quando o countdown acabar, enviar resposta para o servidor
+                    sendAnswer();
                 }
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
@@ -63,7 +62,8 @@ public class ClientObjects {
         }
     }
 
-    public void countdown(int seconds) {
+    //TODO isto vai ser bloqueante???
+    public void countdownInGUI(int seconds) {
         for (int i = seconds; i >= 0; i--) {
             System.out.println("Time left: " + i);
             clientGUI.updateTimerLabel(i);
@@ -75,21 +75,15 @@ public class ClientObjects {
             }
         }
 
-        System.out.println("Finished!");
+        System.out.println("Time has run out!");
     }
 
-    private void closeCon() {
-        try {
-            if (socket != null)
-                socket.close();
-            if (in != null)
-                in.close();
-            if (out != null)
-                out.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    void sendAnswer () throws IOException, ClassNotFoundException {
+        AnswerFromClient answerFromClient = new AnswerFromClient(clientGUI.getSelectedOption());
+        out.writeObject(answerFromClient);
+        System.out.println("Resposta enviada: " + answerFromClient.getSelectedOptionIndex());
     }
+
 
     void connectToServer () throws IOException {
         InetAddress endereco = InetAddress.getByName ( null );
@@ -101,17 +95,18 @@ public class ClientObjects {
     void sendConfirmation () throws IOException, ClassNotFoundException {
         ReceptionConfirmationMessage receptionConfirmationMessage = new ReceptionConfirmationMessage(System.currentTimeMillis());
         out.writeObject(receptionConfirmationMessage);
+        out.flush();
         System.out.println("Confirmação enviada!");
 //        long serverSentAt = timeMessage.getCurrentTimeMillis();
 //        long clientReceivedAt = receptionConfirmationMessage.getReceivedAtMillis();
 //        long latency = clientReceivedAt - serverSentAt;
 //        displayedTime = serverSentAt - latency;
 
-        try {
-                Thread.sleep ( 3000 );
-            } catch ( InterruptedException e ) {
-                e . printStackTrace ();
-            }
+//        try {
+//                Thread.sleep ( 3000 );
+//            } catch ( InterruptedException e ) {
+//                e . printStackTrace ();
+//            }
 //
 //        for (int i = 0; i < 10; i ++) {
 //            Mensagem message= new Mensagem(i,"ola");
@@ -133,8 +128,19 @@ public class ClientObjects {
         out.flush();
 
     }
-    public long getdisplayedTime() {
-        return displayedTime;
+
+    private void closeCon() {
+        try {
+            if (socket != null)
+                socket.close();
+            if (in != null)
+                in.close();
+            if (out != null)
+                out.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
+
 
 }

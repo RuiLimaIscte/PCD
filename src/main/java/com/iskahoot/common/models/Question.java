@@ -18,7 +18,7 @@ public class Question implements Serializable {
     public Question() {
     }
 
-    public Question(String question, int points, int correct, String type, List<String> options) {
+    public Question(String question,int correct, int points, String type, List<String> options) {
         this.question = question;
         this.points = points;
         this.correct = correct;

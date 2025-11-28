@@ -11,14 +11,16 @@ import java.util.Map;
 
 
 public class GameState {
-    private final Room room;
-    private final List<Question> questions;
+    private  Room room;
+    private  List<Question> questions;
     private ScoreboardData lastScoreboard; //cache do ultimo scoreboard
     private int currentQuestionIndex;
     private Question currentQuestion;
     private volatile boolean roundActive;
     private long roundStartTime;
     private static final int ROUND_DURATION_SECONDS = 30;
+    //TODO para teste
+    private Quiz quiz;
 
     //private final java.util.Map<String, Integer> playerAnswers = new java.util.HashMap<>();     O nosso player guarda esta informação
     //private final java.util.List<String> answerOrder = new java.util.ArrayList<>();             no entanto pode vir a dar jeito
@@ -30,6 +32,22 @@ public class GameState {
         this.currentQuestionIndex = -1;
         this.roundActive = false;
     }
+
+    public GameState(Quiz quiz) {
+        this.quiz = quiz;
+        this.questions = quiz.getQuestions();
+        this.currentQuestionIndex = -1;
+    }
+    //TODO TESTE
+//    public void startGame() {
+//        for (Question q : questions) {
+//            SendQuestion(q);
+//            latch.await();       // espera respostas ou timeout
+//            processAnswers();
+//            SendScoreboard();
+//        }
+//    }
+    //TODO FIM DE TESTE
 
     public synchronized boolean nextRound() {
         currentQuestionIndex++;

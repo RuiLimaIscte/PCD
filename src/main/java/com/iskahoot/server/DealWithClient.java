@@ -1,20 +1,33 @@
 package com.iskahoot.server;
 
+import com.iskahoot.common.messages.AnswerFromClient;
 import com.iskahoot.common.messages.Mensagem;
 import com.iskahoot.common.messages.ReceptionConfirmationMessage;
 import com.iskahoot.common.messages.TimeMessage;
+import com.iskahoot.common.models.Quiz;
 
 import java.io.*;
 import java.net.Socket;
+
+import static com.iskahoot.utils.QuestionLoader.loadFromFile;
 
 public class DealWithClient extends Thread {
     private Socket connection;
     private ObjectInputStream in;
     private ObjectOutputStream out;
+    //TODO TESTE
+    private  Server server;
 
-    public DealWithClient(Socket connection) {
+
+    public DealWithClient(Socket connection,Server server) {
+        this.connection = connection;
+        this.server = server;
+    }
+
+        public DealWithClient(Socket connection){
         this.connection = connection;
     }
+
 
     @Override
     public void run() {
@@ -29,26 +42,6 @@ public class DealWithClient extends Thread {
         }
     }
 
-    private void closeConnection() {
-        try {
-            if (connection != null)
-                connection.close();
-            if (in != null)
-                in.close();
-            if (out != null)
-                out.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    private void setStreams() throws IOException {
-        out = new ObjectOutputStream(connection.getOutputStream());
-        out.flush();
-        in = new ObjectInputStream(connection.getInputStream());
-    }
-
     private void serve() throws IOException {
         while (true) {
             Object obj;
@@ -58,10 +51,25 @@ public class DealWithClient extends Thread {
                     ReceptionConfirmationMessage confirmation = (ReceptionConfirmationMessage) obj;
                     System.out.println("Confirmação recebida do cliente: " + confirmation.getReceivedAtMillis());
                 }
-//                if (((Mensagem) obj).getMessage().equals("FIM"))
-//                    break;
-//                System.out.println("Eco: " + ((Mensagem) obj).getMessage() + " id: " + ((Mensagem) obj).getId());
-//                out.writeObject(obj);
+                else  if (obj instanceof AnswerFromClient) {
+                    AnswerFromClient answer = (AnswerFromClient) obj;
+                    System.out.println("Resposta recebida do cliente: " + answer.getSelectedOptionIndex());
+
+                    //TODO TESTE
+//                    ModifiedCountdownLatch latch = server.getGameState().getCurrentLatch();
+//                    int multiplier = latch.countdown(); // devolve 2, 1 ou 0
+//
+//                    if (multiplier == 0) {
+//                        // resposta fora do prazo -> ignorar (ou registar como late)
+//                    } else {
+//                        int questionPoints = server.getGameState().getCurrentQuestion().getPoints();
+//                        int earned = questionPoints * multiplier;
+//                        // regista scoredPlayerScore/score na estrutura do servidor (GameState)
+//                        server.getGameState().submitPlayerAnswer(playerId, answer, earned);
+//                    }
+
+                    //TODO END OF TESTE
+                }
             } catch (IOException | ClassNotFoundException e) {
 
             }
@@ -89,6 +97,24 @@ public class DealWithClient extends Thread {
 //        out.writeObject(new Mensagem(-1,"FIM"));
     }
 
+    private void closeConnection() {
+        try {
+            if (connection != null)
+                connection.close();
+            if (in != null)
+                in.close();
+            if (out != null)
+                out.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void setStreams() throws IOException {
+        out = new ObjectOutputStream(connection.getOutputStream());
+        out.flush();
+        in = new ObjectInputStream(connection.getInputStream());
+    }
 
 }
 

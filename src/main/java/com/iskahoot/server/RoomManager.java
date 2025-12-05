@@ -63,4 +63,5 @@ public class RoomManager {
         activeRooms.remove(code);
         System.out.println("Sala removida: " + code);
     }
+
 }

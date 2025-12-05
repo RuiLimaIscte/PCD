@@ -19,14 +19,9 @@ public class Server {
     private int porto;
     private ServerSocket serverSocket;
     private final List<DealWithClient> clients = new CopyOnWriteArrayList<DealWithClient>();
-
-    public GameState getGameState() {
-        return gameState;
-    }
-
     //TODO TESTE
 //    private CountDownLatch latch;
-    GameState gameState = new GameState(new Quiz(loadFromFile("src/main/resources/questions.json").getName(),
+    private GameState gameState = new GameState(new Quiz(loadFromFile("src/main/resources/questions.json").getName(),
             loadFromFile("src/main/resources/questions.json").getQuestions()));
 
     public static void main ( String [] args ) {
@@ -43,6 +38,10 @@ public class Server {
 
     public Server(int porto) throws IOException {
         this.porto=porto;
+    }
+
+    public GameState getGameState() {
+        return gameState;
     }
 
     public void startServing () throws IOException {

@@ -2,9 +2,7 @@ package com.iskahoot.common.models;
 
 import java.io.Serializable;
 
-/**
- * Represents a player in the game
- */
+
 public class Player implements Serializable {
     private static final long serialVersionUID = 1L;
 

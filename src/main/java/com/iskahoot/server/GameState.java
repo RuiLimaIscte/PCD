@@ -38,6 +38,9 @@ public class GameState {
         this.questions = quiz.getQuestions();
         this.currentQuestionIndex = -1;
     }
+    public Question getQuestionByIndex(int index) {
+        return questions.get(index);
+    }
     //TODO TESTE
 //    public void startGame() {
 //        for (Question q : questions) {

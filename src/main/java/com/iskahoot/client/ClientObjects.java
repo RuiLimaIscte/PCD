@@ -1,10 +1,12 @@
 package com.iskahoot.client;
 
 import com.iskahoot.common.messages.AnswerFromClient;
+import com.iskahoot.common.messages.CurrentQuestion;
 import com.iskahoot.common.messages.ReceptionConfirmationMessage;
 import com.iskahoot.common.messages.TimeMessage;
 import com.iskahoot.common.models.Quiz;
 import com.iskahoot.server.Server;
+import com.iskahoot.utils.AnswerListener;
 
 import java.io.*;
 import java.net.InetAddress;
@@ -40,22 +42,34 @@ public class ClientObjects {
         while (true) {
             try {
                 Object obj = in.readObject();
-                if (obj instanceof TimeMessage) {
-                    TimeMessage timeMessage = (TimeMessage) obj;
-                    long serverTime = timeMessage.getCurrentTimeMillis();
-                    System.out.println("Hora do servidor: " + serverTime);
-                    sendConfirmation();
+                if (obj instanceof CurrentQuestion) {
+                    CurrentQuestion currentQuestion = (CurrentQuestion) obj;
 
-                    //TODO  mudar isto para receber info do servidor e nao crirar um quiz no Client
-                    Quiz quiz = new Quiz(loadFromFile("src/main/resources/questions.json").getName(),
-                            loadFromFile("src/main/resources/questions.json").getQuestions());
-
-                    clientGUI = new SimpleClientGUI(quiz.getQuestions(), "Client 1");
-                    System.out.println(timeMessage.getTimeToEndRound());
-                    countdownInGUI((int) timeMessage.getTimeToEndRound());
-                    //TODO quando o countdown acabar, enviar resposta para o servidor
-                    sendAnswer();
+                    clientGUI = new SimpleClientGUI(currentQuestion, "Client 1", (answer) -> {
+                        try {
+                            out.writeObject(answer);
+                            out.flush();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    });
                 }
+//                else if (obj instanceof TimeMessage) {
+//                    TimeMessage timeMessage = (TimeMessage) obj;
+//                    long serverTime = timeMessage.getCurrentTimeMillis();
+//                    System.out.println("Hora do servidor: " + serverTime);
+//                    sendConfirmation();
+//
+//                    //TODO  mudar isto para receber info do servidor e nao crirar um quiz no Client
+//                    Quiz quiz = new Quiz(loadFromFile("src/main/resources/questions.json").getName(),
+//                            loadFromFile("src/main/resources/questions.json").getQuestions());
+//
+//                    clientGUI = new SimpleClientGUI(quiz.getQuestions(), "Client 1");
+//                    System.out.println(timeMessage.getTimeToEndRound());
+//                    countdownInGUI((int) timeMessage.getTimeToEndRound());
+//
+//                    sendAnswer();
+//                }
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
             }

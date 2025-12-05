@@ -4,9 +4,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Represents a team of 2 players
- */
 public class Team implements Serializable {
     private static final long serialVersionUID = 1L;
 

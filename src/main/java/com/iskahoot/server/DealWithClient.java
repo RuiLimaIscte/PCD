@@ -1,9 +1,7 @@
 package com.iskahoot.server;
 
-import com.iskahoot.common.messages.AnswerFromClient;
-import com.iskahoot.common.messages.Mensagem;
-import com.iskahoot.common.messages.ReceptionConfirmationMessage;
-import com.iskahoot.common.messages.TimeMessage;
+import com.iskahoot.common.messages.*;
+import com.iskahoot.common.models.Question;
 import com.iskahoot.common.models.Quiz;
 
 import java.io.*;
@@ -34,6 +32,7 @@ public class DealWithClient extends Thread {
         try {
             setStreams();
             sendTime();
+            sendQuestion(server.getGameState().getQuestionByIndex(0));
             serve();
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
@@ -51,29 +50,46 @@ public class DealWithClient extends Thread {
                     ReceptionConfirmationMessage confirmation = (ReceptionConfirmationMessage) obj;
                     System.out.println("Confirmação recebida do cliente: " + confirmation.getReceivedAtMillis());
                 }
-                else  if (obj instanceof AnswerFromClient) {
-                    AnswerFromClient answer = (AnswerFromClient) obj;
-                    System.out.println("Resposta recebida do cliente: " + answer.getSelectedOptionIndex());
 
-                    //TODO TESTE
-//                    ModifiedCountdownLatch latch = server.getGameState().getCurrentLatch();
-//                    int multiplier = latch.countdown(); // devolve 2, 1 ou 0
-//
-//                    if (multiplier == 0) {
-//                        // resposta fora do prazo -> ignorar (ou registar como late)
-//                    } else {
-//                        int questionPoints = server.getGameState().getCurrentQuestion().getPoints();
-//                        int earned = questionPoints * multiplier;
-//                        // regista scoredPlayerScore/score na estrutura do servidor (GameState)
-//                        server.getGameState().submitPlayerAnswer(playerId, answer, earned);
-//                    }
+                else if (obj instanceof CurrentQuestion) {
+                    CurrentQuestion resposta = (CurrentQuestion) obj;
 
-                    //TODO END OF TESTE
+                    if (resposta.getSelectedAnswerIndex() != null) {
+                        System.out.println("O cliente respondeu: " + resposta.getSelectedAnswerIndex());
+                        // Processar pontuação...
+                    }
                 }
+//                else  if (obj instanceof AnswerFromClient) {
+//                    AnswerFromClient answer = (AnswerFromClient) obj;
+//                    System.out.println("Resposta recebida do cliente: " + answer.getSelectedOptionIndex());
+//
+//                    //TODO TESTE
+////                    ModifiedCountdownLatch latch = server.getGameState().getCurrentLatch();
+////                    int multiplier = latch.countdown(); // devolve 2, 1 ou 0
+////
+////                    if (multiplier == 0) {
+////                        // resposta fora do prazo -> ignorar (ou registar como late)
+////                    } else {
+////                        int questionPoints = server.getGameState().getCurrentQuestion().getPoints();
+////                        int earned = questionPoints * multiplier;
+////                        // regista scoredPlayerScore/score na estrutura do servidor (GameState)
+////                        server.getGameState().submitPlayerAnswer(playerId, answer, earned);
+////                    }
+//
+//                    //TODO END OF TESTE
+//                }
             } catch (IOException | ClassNotFoundException e) {
 
             }
         }
+    }
+    public void sendQuestion(Question q) throws IOException {
+        // Cria o pacote com a pergunta e opções
+        CurrentQuestion currentQuestion = new CurrentQuestion(q.getQuestion(), q.getOptions());
+
+        // O campo 'selectedAnswerIndex' segue vazio (null)
+        out.writeObject(currentQuestion);
+        out.flush();
     }
 
     void sendTime() throws IOException, ClassNotFoundException {

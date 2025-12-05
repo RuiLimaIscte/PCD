@@ -3,9 +3,7 @@ package com.iskahoot.common.models;
 import java.io.Serializable;
 import java.util.List;
 
-/**
- * Represents a quiz question
- */
+
 public class Question implements Serializable {
     private static final long serialVersionUID = 1L;
 

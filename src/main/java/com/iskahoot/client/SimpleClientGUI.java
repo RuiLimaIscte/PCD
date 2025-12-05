@@ -1,7 +1,9 @@
 package com.iskahoot.client;
 
+import com.iskahoot.common.messages.CurrentQuestion;
 import com.iskahoot.common.models.Question;
 import com.iskahoot.common.models.Quiz;
+import com.iskahoot.utils.AnswerListener;
 
 import javax.swing.*;
 import java.awt.*;
@@ -18,8 +20,11 @@ public class SimpleClientGUI extends JFrame {
     private static JLabel timerLabel;
     private JTextArea scoreboardArea;
 
+    private CurrentQuestion currentQuestion;
+    private AnswerListener listener;
+
     private List<Question> questions;
-    private int currentQuestion = 0;
+    private int currentQuestionindex = 0;
 
     public int getSelectedOption() {
         return selectedOption;
@@ -32,17 +37,18 @@ public class SimpleClientGUI extends JFrame {
     private String clientInfo;
 
 
-    public static void main(String[] args) throws IOException {
-        Quiz quiz = new Quiz(loadFromFile("src/main/resources/questions.json").getName(),
-                loadFromFile("src/main/resources/questions.json").getQuestions());
+//    public static void main(String[] args) throws IOException {
+//        Quiz quiz = new Quiz(loadFromFile("src/main/resources/questions.json").getName(),
+//                loadFromFile("src/main/resources/questions.json").getQuestions());
+//
+//        new SimpleClientGUI(quiz.getQuestions(), "Client 1");
+//    }
 
-        new SimpleClientGUI(quiz.getQuestions(), "Client 1");
-    }
+    public SimpleClientGUI(CurrentQuestion currentQuestion, String clientInfo, AnswerListener listener) {
 
-    public SimpleClientGUI(List<Question> questions, String clientInfo) {
-
-        this.questions = questions;
+        this.currentQuestion = currentQuestion;
         this.clientInfo = clientInfo;
+        this.listener = listener;
 
         setTitle(clientInfo);
         setSize(700, 300);
@@ -52,9 +58,10 @@ public class SimpleClientGUI extends JFrame {
 
         buildGUI();
 
-        if (questions != null && !questions.isEmpty()) {
-            displayQuestion(questions.get(0));
-        }
+        displayQuestion(currentQuestion);
+//        if (questions != null && !questions.isEmpty()) {
+//            displayQuestion(questions.get(0));
+//        }
 
         setVisible(true);
     }
@@ -79,7 +86,7 @@ public class SimpleClientGUI extends JFrame {
 
         add(optionsPanel, BorderLayout.CENTER);
 
-        // --- PAINEL LATERAL ---
+        // side panel
         JPanel sidePanel = new JPanel(new BorderLayout());
         sidePanel.setPreferredSize(new Dimension(180, 0));
 
@@ -101,41 +108,47 @@ public class SimpleClientGUI extends JFrame {
         add(sidePanel, BorderLayout.EAST);
     }
 
-    // -----------------------------------------
-    //         DISPLAY QUESTION
-    // -----------------------------------------
-    private void displayQuestion(Question q) {
-
-//        waitingForAnswer = true;
-        selectedOption = -1;
-
-        questionLabel.setText(q.getQuestion());
-
+    private void displayQuestion(CurrentQuestion p) {
+        questionLabel.setText(p.getQuestionText());
         for (int i = 0; i < 4; i++) {
-            optionButtons[i].setText(q.getOptions().get(i));
-            optionButtons[i].setEnabled(true);
+            optionButtons[i].setText(p.getOptions().get(i));
         }
-        //        startTimer(30);
-        //   updateTimerLabel(30);
     }
+
+
+//    private void displayQuestion(Question q) {
+//
+////        waitingForAnswer = true;
+//        selectedOption = -1;
+//
+//        questionLabel.setText(q.getQuestion());
+//
+//        for (int i = 0; i < 4; i++) {
+//            optionButtons[i].setText(q.getOptions().get(i));
+//            optionButtons[i].setEnabled(true);
+//        }
+//        //        startTimer(30);
+//        //   updateTimerLabel(30);
+//    }
 
     //Timer update method
     public static void updateTimerLabel(long timeLeft) {
-        if (timeLeft < 0) timeLeft = 0;
-        timerLabel.setText("Timer: " + timeLeft);
+//        if (timeLeft < 0) timeLeft = 0;
+//        timerLabel.setText("Timer: " + timeLeft);
+        SwingUtilities.invokeLater(() -> {
+            timerLabel.setText("Timer: " + timeLeft);
+        });
     }
 
 
-    // -----------------------------------------
-    //        HANDLE OPTION SELECTION
-    // -----------------------------------------
-    private void handleOption(int index) {
 
-//        if (!waitingForAnswer) return;
+    private void handleOption(int index) {
 
         selectedOption = index;
 //        waitingForAnswer = false;
 //        stopTimer();
+        //TODO enviar resposta para o servidor
+//        sendAnswer();
 
         for (int i = 0; i < 4; i++) {
             optionButtons[i].setEnabled(false);
@@ -143,35 +156,32 @@ public class SimpleClientGUI extends JFrame {
                 optionButtons[i].setBackground(Color.GREEN);
             }
         }
-
-        System.out.println("Selected: " + index);
-
-        //nextQuestion();
-    }
-
-    //TODO nao vai ser usado, o servidor vai dizer qual é e quando passar a pergunta
-    // -----------------------------------------
-    //          NEXT QUESTION
-    // -----------------------------------------
-    private void nextQuestion() {
-
-        currentQuestion++;
-
-        if (currentQuestion >= questions.size()) {
-            showGameEnded();
-            return;
+        if (currentQuestion != null && listener != null) {
+            // 1. O Cliente PREENCHE o campo vazio
+            currentQuestion.setSelectedAnswerIndex(index);
+            // 2. Envia o objeto modificado de volta via Callback
+            listener.onAnswerSelected(currentQuestion);
         }
-
-        // Reset button color
-        for (JButton b : optionButtons)
-            b.setBackground(null);
-
-        displayQuestion(questions.get(currentQuestion));
+        System.out.println("Selected: " + index);
     }
 
-    // -----------------------------------------
-    //         GAME ENDED SCREEN
-    // -----------------------------------------
+
+//    private void nextQuestion() {
+//
+//        currentQuestion++;
+//
+//        if (currentQuestion >= questions.size()) {
+//            showGameEnded();
+//            return;
+//        }
+//
+//        // Reset button color
+//        for (JButton b : optionButtons)
+//            b.setBackground(null);
+//
+//        displayQuestion(questions.get(currentQuestion));
+//    }
+
     private void showGameEnded() {
 
 //        stopTimer();

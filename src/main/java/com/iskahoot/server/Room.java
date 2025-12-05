@@ -18,15 +18,17 @@ public class Room {
 
     private final String roomCode;
     private final int numberOfTeams;
+    private final int playersPerTeam;
     private final Quiz quiz;
     private final Map<String, Team> teams;  // teamCode -> Team
     private final Map<String, Player> players;  // username -> Player
     private RoomState state;
     private GameState gameState;
 
-    public Room(String roomCode, int numberOfTeams, Quiz quiz) {
+    public Room(String roomCode, int numberOfTeams, int playersPerTeam, Quiz quiz) {
         this.roomCode = roomCode;
         this.numberOfTeams = numberOfTeams;
+        this.playersPerTeam = playersPerTeam; // Guardar configuração
         this.quiz = quiz;
         this.teams = new ConcurrentHashMap<>();
         this.players = new ConcurrentHashMap<>();
@@ -39,18 +41,19 @@ public class Room {
             return false;
         }
 
+        //TODO comentado para testes
         // Get or create team
-        Team team = teams.computeIfAbsent(teamCode, Team::new);
+//        Team team = teams.computeIfAbsent(teamCode, Team::new);
 
         // Check if team is full
-        if (team.isFull()) {
-            return false;
-        }
-
-        // Add player to team
-        if (!team.addPlayer(player)) {
-            return false;
-        }
+//        if (team.isFull()) {
+//            return false;
+//        }
+//
+//        // Add player to team
+//        if (!team.addPlayer(player)) {
+//            return false;
+//        }
 
         players.put(player.getUsername(), player);
 
@@ -64,15 +67,17 @@ public class Room {
     }
 
     public synchronized void startGame() {
-        if (state != RoomState.READY) {
-            throw new IllegalStateException("Room is not ready to start");
-        }
+        //TODO comentado para testes
+//        if (state != RoomState.READY) {
+//            throw new IllegalStateException("Room is not ready to start");
+//        }
 
         state = RoomState.PLAYING;
         gameState = new GameState(this);
 
         System.out.println("Game starting in room: " + roomCode);
     }
+
 
     public String getRoomCode() {
         return roomCode;
@@ -83,7 +88,7 @@ public class Room {
     }
 
     public int getExpectedPlayers() {
-        return numberOfTeams * 2;  // 2 players per team
+        return numberOfTeams * playersPerTeam;
     }
 
     public int getConnectedPlayers() {

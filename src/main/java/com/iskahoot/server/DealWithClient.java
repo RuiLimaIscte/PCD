@@ -32,7 +32,7 @@ public class DealWithClient extends Thread {
         try {
             setStreams();
             sendTime();
-            sendQuestion(server.getGameState().getQuestionByIndex(0));
+            sendQuestion(server.getRoomManager().getRoom("game1").getGameState().getQuestionByIndex(0));
             serve();
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();

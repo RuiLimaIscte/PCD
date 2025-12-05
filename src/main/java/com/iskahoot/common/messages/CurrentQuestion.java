@@ -25,7 +25,6 @@ public class CurrentQuestion implements Serializable {
         return selectedAnswerIndex;
     }
 
-    // Setter para o Cliente preencher a resposta
     public void setSelectedAnswerIndex(Integer index) {
         this.selectedAnswerIndex = index;
     }

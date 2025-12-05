@@ -22,7 +22,6 @@ public class RoomManager {
 
     private static RoomManager instance;
 
-    // O construtor é privado, ideal para carregar o Quiz uma única vez
     private RoomManager() {
         try {
             // Carrega o quiz do ficheiro UMA VEZ no arranque
@@ -35,7 +34,8 @@ public class RoomManager {
         } catch (IOException e) {
             System.err.println("ERRO CRÍTICO: Não foi possível carregar o quiz!");
             e.printStackTrace();
-            // Em produção, talvez quisesses fechar o servidor aqui
+
+            //TODO LIDAR MELHOR COM ISTO (// QUEBRAR O SERVIDOR SE NÃO CARREGAR O QUIZ)
         }
     }
 

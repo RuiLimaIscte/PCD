@@ -1,7 +1,10 @@
 package com.iskahoot.common.models;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
+
+import static com.iskahoot.utils.QuestionLoader.loadFromFile;
 
 
 public class Quiz implements Serializable {
@@ -10,7 +13,7 @@ public class Quiz implements Serializable {
     private String name;
     private List<Question> questions;
 
-    public Quiz() {
+    public Quiz()  {
     }
 
     public Quiz(String name, List<Question> questions) {

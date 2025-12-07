@@ -1,11 +1,7 @@
 package com.iskahoot.client;
 
-import com.iskahoot.common.messages.AnswerFromClient;
-import com.iskahoot.common.messages.CurrentQuestion;
-import com.iskahoot.common.messages.ReceptionConfirmationMessage;
-import com.iskahoot.common.messages.TimeMessage;
+import com.iskahoot.common.messages.*;
 import com.iskahoot.common.models.Quiz;
-import com.iskahoot.server.Server;
 import com.iskahoot.utils.AnswerListener;
 
 import java.io.*;
@@ -17,32 +13,63 @@ import static com.iskahoot.utils.QuestionLoader.loadFromFile;
 public class ClientObjects {
     private ObjectInputStream in;
     private ObjectOutputStream out;
-    private Socket socket ;
-    private SimpleClientGUI clientGUI ;
+    private Socket socket;
+    private SimpleClientGUI clientGUI;
 
 
-    public static void main ( String [] args ) {
-        new ClientObjects (). runClient ();
+    public static void main(String[] args) {
+        String ip = args[0];
+        int port = Integer.parseInt(args[1]);
+        String game = args[2];
+        String team = args[3];
+        String client = args[4];
+        new ClientObjects().runClient(ip, port, game, team, client);
     }
 
-    public void runClient () {
+    public void runClient(String ip, int port, String game, String team, String client) {
         try {
-            connectToServer();
+            connectToServer(ip, port);
             setStreams();
+            sendConnectionMessage(game, team, client);
             waitmensages();
 
         } catch (IOException e) {// ERRO ...
-            e . printStackTrace ();
+            e.printStackTrace();
         } finally {// a fechar ...
             closeCon();
         }
+    }
+
+    private void sendConnectionMessage(String game, String team, String client) {
+        ConnectionMessage connectionMessage = new ConnectionMessage(game, team, client);
+        try {
+            out.writeObject(connectionMessage);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    void connectToServer(String ip, int port) throws IOException {
+        InetAddress address = InetAddress.getByName(ip);
+        System.out.println(" Ligacao a : " + address + " : " + port);
+        socket = new Socket(address, port);
+        System.out.println("socket: " + socket);
+
+    }
+
+    void sendAnswer() throws IOException, ClassNotFoundException {
+        AnswerFromClient answerFromClient = new AnswerFromClient(clientGUI.getSelectedOption());
+        out.writeObject(answerFromClient);
+        System.out.println("Resposta enviada: " + answerFromClient.getSelectedOptionIndex());
     }
 
     private void waitmensages() {
         while (true) {
             try {
                 Object obj = in.readObject();
+                System.out.println("Mensagem recebida pelo cliente: " + obj);
                 if (obj instanceof CurrentQuestion) {
+                    System.out.println("Tipo: CurrentQuestion recebida pelo cliente");
                     CurrentQuestion currentQuestion = (CurrentQuestion) obj;
 
                     clientGUI = new SimpleClientGUI(currentQuestion, "Client 1", (answer) -> {
@@ -70,6 +97,9 @@ public class ClientObjects {
 //
 //                    sendAnswer();
 //                }
+            } catch (EOFException e) {
+                System.out.println("Connection closed by server.");
+                break;
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
@@ -92,21 +122,10 @@ public class ClientObjects {
         System.out.println("Time has run out!");
     }
 
-    void sendAnswer () throws IOException, ClassNotFoundException {
-        AnswerFromClient answerFromClient = new AnswerFromClient(clientGUI.getSelectedOption());
-        out.writeObject(answerFromClient);
-        System.out.println("Resposta enviada: " + answerFromClient.getSelectedOptionIndex());
-    }
 
 
-    void connectToServer () throws IOException {
-        InetAddress endereco = InetAddress.getByName ( null );
-        System.out.println ( " Ligacao a : " + endereco + " : " + Server.PORTO );
-        socket = new Socket (endereco , Server.PORTO );
-        System.out.println("socket: " + socket);
-    }
 
-    void sendConfirmation () throws IOException, ClassNotFoundException {
+    void sendConfirmation() throws IOException, ClassNotFoundException {
         ReceptionConfirmationMessage receptionConfirmationMessage = new ReceptionConfirmationMessage(System.currentTimeMillis());
         out.writeObject(receptionConfirmationMessage);
         out.flush();

@@ -1,129 +1,100 @@
-package com.iskahoot.server;
-
-import com.iskahoot.common.messages.AnswerFromClient;
-import com.iskahoot.common.models.Quiz;
-
-import java.io.*;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.List;
-import java.util.Scanner;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.CountDownLatch;
-
-import static com.iskahoot.utils.QuestionLoader.loadFromFile;
-
-//TODO Guardar referencia a todos os clients ligados
-public class Server {
-
-    public static final int PORTO = 8080;
-    private int porto;
-    private ServerSocket serverSocket;
-    private final List<DealWithClient> clients = new CopyOnWriteArrayList<DealWithClient>();
-    //TODO TESTE
-//    private CountDownLatch latch;
-//    private GameState gameState = new GameState(new Quiz(loadFromFile("src/main/resources/questions.json").getName(),
-//            loadFromFile("src/main/resources/questions.json").getQuestions()));
-    private RoomManager roomManager = RoomManager.getInstance();
-
-    public static void main ( String [] args ) {
-        try {
-            new Server().startServing(args);
-        } catch ( IOException e ) {
-
-        }
-    }
-
-    public Server() throws IOException {
-        this.porto=PORTO;
-    }
-
-    public Server(int porto) throws IOException {
-        this.porto=porto;
-    }
-
-    public RoomManager getRoomManager() {
-        return roomManager;
-    }
-
-//    public GameState getGameState() {
-//        return gameState;
+//package com.iskahoot.server;
+//
+//import com.iskahoot.common.messages.ConnectionMessage;
+//
+//import java.io.*;
+//import java.net.ServerSocket;
+//import java.net.Socket;
+//import java.util.*;
+//
+//public class Server {
+//
+//    public static final int PORTO = 8080;
+//    private int port;
+//    private ServerSocket serverSocket;
+//
+//    private final Map<GameState, List<DealWithClient2>> clientsByGame = new HashMap<>();
+//
+//    private int roomCounter = 0;
+//
+//    public static void main ( String [] args ) {
+//        try {
+//            new Server().startServing();
+//        } catch ( IOException e ) {
+//
+//        }
 //    }
-
-    public void startServing (String[] args) throws IOException {
-        configurarJogoInicial(args);
-
-        try {
-            serverSocket = new ServerSocket ( porto );
-            while ( true ) {
-                //wait for a connection
-                Socket socket = serverSocket.accept();
-                DealWithClient handler = new DealWithClient(socket,this);
-                clients.add(handler);
-                handler.start();
-
-                // ADICIONAR ISTO PARA TESTAR O TEMPO:
-//                if (clients.size() == 1) { // Apenas para teste, arranca com 1 jogador
-//                    new GameSession(clients).start();
+//
+//    public Server() throws IOException {
+//        this.port =PORTO;
+//    }
+//
+//    public void startServing () throws IOException {
+//
+//        // While true Wait for "new numberteams numberplayers" if(someone writes that then creates new thread for game)
+////        new thread para haverem jogos ao mesmo tempo -> configurarJogoInicial( numberteams, numberplayers);
+//
+//    }
+//
+//    private void configurarJogoInicial(int numberTeams, int numberPlayers) {
+//        System.out.println(" \n Código da Sala: game" + roomCounter);
+//        System.out.println(" Configuração: " + numberTeams + " equipas de " + numberPlayers + " jogadores.");
+//
+//        GameState gameState = new GameState(new Game("game"+roomCounter, numberTeams, numberPlayers));
+//        clientsByGame.put(gameState, new ArrayList<>());
+//        roomCounter++;
+//
+//        gameState.getGame().startGame();
+//
+//        // wait for players to join the room
+//        try {
+//            serverSocket = new ServerSocket (port);
+//            while ( true ) {
+//                //wait for a connection
+//                Socket socket = serverSocket.accept();
+//                DealWithClient2 client = new DealWithClient2(socket, gameState);
+//                client.start();
+//                ConnectionMessage connectionMessage;
+//                while (true) {
+//                    Object obj;
+//                    try {
+//                        obj = new ObjectInputStream(socket.getInputStream()).readObject();
+//                        if (obj instanceof ConnectionMessage) {
+//                            connectionMessage = (ConnectionMessage) obj;
+//                            System.out.println("Cliente conectado: " + connectionMessage.getClientCode());
+//                            break;
+//                        }
+//                    } catch (ClassNotFoundException e) {
+//                        throw new RuntimeException(e);
+//                    }
 //                }
-            }
-        } catch ( IOException e ) {
-            e.printStackTrace ();
-        } finally {
-            if(serverSocket != null) {
-                try {
-                    serverSocket.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-
-//    void WaitConnections () throws IOException {
-//        Socket connection = serverSocket.accept();
-//        ConnectionHandler handler = new ConnectionHandler(connection);
-//        handler.start();
+//                //
+//                if(connectionMessage.getGameCode().equals(gameState.getGame().getGameCode())){
+//                    if(gameState.getGame().addPlayer(connectionMessage.getTeamCode(), connectionMessage.getClientCode())) {
+//                        clientsByGame.get(gameState).add(client);
+//                        System.out.println("Novo cliente conectado ao jogo " + gameState.getGame().getGameCode());
+//                    } else {
+//                        System.out.println("Sala cheia. Cliente não pode se conectar ao jogo " + gameState.getGame().getGameCode());
+//                        socket.close();
+//                    }
+//                }
+//
+//
+//            }
+//        } catch ( IOException e ) {
+//            e.printStackTrace ();
+//        } finally {
+//            if(serverSocket != null) {
+//                try {
+//                    serverSocket.close();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }
+//
 //    }
-
-    private void configurarJogoInicial(String[] args) {
-        int numEquipas = 0;
-        int jogadoresPorEquipa = 0;
-
-            Scanner sc = new Scanner(System.in);
-            System.out.println("Configuração do Jogo");
-
-            // Validação simples para equipas
-            do {
-                System.out.print("Número de Equipas: ");
-                while (!sc.hasNextInt()) {
-                    System.out.println("Por favor insira um número inteiro.");
-                    sc.next();
-                }
-                numEquipas = sc.nextInt();
-            } while (numEquipas <= 0);
-
-            // Validação simples para jogadores
-            do {
-                System.out.print("Jogadores por Equipa: ");
-                while (!sc.hasNextInt()) {
-                    System.out.println("Por favor insira um número inteiro.");
-                    sc.next();
-                }
-                jogadoresPorEquipa = sc.nextInt();
-            } while (jogadoresPorEquipa <= 0);
-
-        String codigo = getRoomManager().createRoom(numEquipas, jogadoresPorEquipa);
-
-        //TODO apaenas para teste, depois é precioso alterar para aguradar todos os jogadores
-        // Forçar o início do jogo para o gameState ser criado e não dar erro no cliente
-        // Nota: Isto é apenas para teste, num jogo real esperarias pelos jogadores todos.
-        Room sala = getRoomManager().getRoom(codigo);
-        sala.startGame();
-
-        System.out.println(" \n Código da Sala: " + codigo);
-        System.out.println(" Configuração: " + numEquipas + " equipas de " + jogadoresPorEquipa + " jogadores.");
-    }
-}
-
-
+//
+//}
+//
+//

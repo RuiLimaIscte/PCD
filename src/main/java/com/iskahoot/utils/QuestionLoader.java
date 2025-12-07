@@ -15,7 +15,7 @@ import java.util.ArrayList;
 public class QuestionLoader {
 
 
-    public static Quiz loadFromFile(String filePath) throws IOException {
+    public static Quiz loadFromFile(String filePath) {
         Gson gson = new Gson();
         JsonReader jsonReader;
             try {

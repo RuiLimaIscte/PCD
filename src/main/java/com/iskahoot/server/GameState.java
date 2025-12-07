@@ -79,9 +79,6 @@ public class GameState extends Thread {
                 }
 
                 System.out.println("Tempo esgotado ou todos responderam. Próxima pergunta...");
-
-                // Opcional: Pequena pausa para verem o resultado antes da próxima
-                Thread.sleep(2000);
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -90,15 +87,16 @@ public class GameState extends Thread {
         System.out.println("Jogo Terminado.");
         game.setStatus(Game.STATUS.FINISHED);
     }
+    //TODO score
     public synchronized void receiveAnswer(String clientCode, int answerIndex) {
-        // 1. Registar que este cliente respondeu
+        // Registar que este cliente respondeu
         playersWhoAnswered.add(clientCode);
         System.out.println("Resposta recebida de " + clientCode + ". Total: " + playersWhoAnswered.size());
 
-        // 2. Verificar se TODOS já responderam
-        if (playersWhoAnswered.size() >= connectedClients.size()) { // Assume que tens este método no Game
+        // Verificar se TODOS já responderam
+        if (playersWhoAnswered.size() >= connectedClients.size()) {
             System.out.println("Todos responderam! Avançando...");
-            notifyAll(); // <--- ACORDA O LOOP (sai do wait)
+            notifyAll();
         }
     }
     private synchronized void broadcastQuestion(Question q) {

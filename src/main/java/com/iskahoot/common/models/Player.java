@@ -6,15 +6,15 @@ import java.io.Serializable;
 public class Player implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private String username;
+    private String playerCode;
     private String teamCode;
     private String gameCode;
     private int individualScore;
     private boolean hasAnswered;
     private Integer currentAnswer;
 
-    public Player(String username, String teamCode, String gameCode) {
-        this.username = username;
+    public Player(String playerCode, String teamCode, String gameCode) {
+        this.playerCode = playerCode;
         this.teamCode = teamCode;
         this.gameCode = gameCode;
         this.individualScore = 0;
@@ -22,8 +22,8 @@ public class Player implements Serializable {
         this.currentAnswer = null;
     }
 
-    public String getUsername() {
-        return username;
+    public String getPlayerCode() {
+        return playerCode;
     }
 
     public String getTeamCode() {
@@ -71,7 +71,7 @@ public class Player implements Serializable {
     @Override
     public String toString() {
         return "Player{" +
-                "username='" + username + '\'' +
+                "username='" + playerCode + '\'' +
                 ", team='" + teamCode + '\'' +
                 ", score=" + individualScore +
                 '}';
@@ -82,12 +82,12 @@ public class Player implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Player player = (Player) o;
-        return username.equals(player.username);
+        return playerCode.equals(player.playerCode);
     }
 
     @Override
     public int hashCode() {
-        return username.hashCode();
+        return playerCode.hashCode();
     }
 }
 

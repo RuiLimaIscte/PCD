@@ -2,7 +2,6 @@ package com.iskahoot.server;
 
 import com.iskahoot.common.messages.ConnectionMessage;
 import com.iskahoot.common.messages.QuestionMessage;
-import com.iskahoot.common.messages.ReceptionConfirmationMessage;
 import com.iskahoot.common.messages.TimeMessage;
 import com.iskahoot.common.models.Question;
 
@@ -113,22 +112,16 @@ public class GameServer {
             in = new ObjectInputStream(socket.getInputStream());
         }
 
-        // Loop infinito para receber respostas do cliente
+
         private void listenForAnswers() throws IOException, ClassNotFoundException {
             while (true) {
                 Object obj = in.readObject();
-                // Aqui receberás as respostas dos clientes
-                // Ex: if (obj instanceof AnswerMessage) { ... }
+
                 System.out.println("Recebi objeto do cliente: " + obj.getClass().getSimpleName());
-                if (obj instanceof QuestionMessage) { // Assumindo que usas QuestionMessage ou AnswerMessage
+                if (obj instanceof QuestionMessage) {
                     QuestionMessage resposta = (QuestionMessage) obj;
                     System.out.println("Resposta: " + resposta.getSelectedAnswerIndex() + " de: " + resposta.getClientCode());
-                    // Vai buscar o GameState atual (já o tens guardado na variável 'gameState' ou no mapa)
-                    // NOTA: Precisas de ter acesso à instância do GameState aqui
 
-                    // AVISA O GAMESTATE QUE CHEGOU UMA RESPOSTA
-                    // Passamos o ID do cliente (para o Set) e a resposta
-                    // Assumindo que msg.getClientCode() está disponível ou guardaste no DealWithClient
                     gameState.receiveAnswer(resposta.getClientCode(), resposta.getSelectedAnswerIndex());
                 }
             }

@@ -1,5 +1,7 @@
 package com.iskahoot.common.messages;
 
+import com.iskahoot.common.models.Player;
+
 import java.io.Serializable;
 
 public class ConnectionMessage implements Serializable {
@@ -9,10 +11,10 @@ public class ConnectionMessage implements Serializable {
     private String teamCode;
     private String clientCode;
 
-    public ConnectionMessage(String gameCode, String teamCode, String clientCode) {
-        this.gameCode = gameCode;
-        this.teamCode = teamCode;
-        this.clientCode = clientCode;
+    public ConnectionMessage(Player player) {
+        this.gameCode = player.getGameCode();
+        this.teamCode = player.getTeamCode();
+        this.clientCode = player.getPlayerCode();
     }
     public String getGameCode() {
         return gameCode;

@@ -48,7 +48,7 @@ public class SimpleClientGUI extends JFrame {
         this.player = clientInfo;
         this.listener = listener;
 
-        setTitle("Kahoot Client - " + player.getUsername() + " " + player.getTeamCode() + " " + player.getGameCode() );
+        setTitle("Kahoot Client - " + player.getPlayerCode() + " " + player.getTeamCode() + " " + player.getGameCode() );
         setSize(700, 300);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -154,19 +154,16 @@ public class SimpleClientGUI extends JFrame {
     }
 
     public void startTimer(int totalSeconds) {
-        // 1. Se já existir um contador a correr, pára-o primeiro (para não teres dois a lutar)
-//        stopTimer();
 
         // 2. Criar uma nova thread para NÃO bloquear a janela
         countdownThread = new Thread(() -> {
-            int timeLeft = totalSeconds/1000;
+            int timeLeft = totalSeconds;
 
             try {
                 while (timeLeft >= 0) {
 
                     timerLabel.setText("Timer: " + timeLeft);
 
-                    // Muda a cor se faltar pouco tempo (opcional)
                     if (timeLeft <= 5) {
                         timerLabel.setForeground(Color.RED);
                     } else {
@@ -177,14 +174,10 @@ public class SimpleClientGUI extends JFrame {
 
                     timeLeft--;
                 }
+                timerLabel.setText("Tempo Acabou");
 
-                // O tempo acabou!
-                timerLabel.setText("Tempo Esgotado!");
-                // Desativar botões, etc...
 
             } catch (InterruptedException e) {
-                // Se a thread for interrompida (pelo stopTimer), sai do loop calmamente
-                return;
             }
         });
 
@@ -217,7 +210,7 @@ public class SimpleClientGUI extends JFrame {
         if (questionMessage != null && listener != null) {
             // 1. O Cliente PREENCHE o campo vazio
             questionMessage.setSelectedAnswerIndex(index);
-            questionMessage.setClientCode(player.getUsername());
+            questionMessage.setClientCode(player.getPlayerCode());
             // 2. Envia o objeto modificado de volta via Callback
             listener.onAnswerSelected(questionMessage);
         }

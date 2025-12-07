@@ -17,14 +17,8 @@ public class TimeMessage implements Serializable {
         return currentTimeMillis;
     }
 
-    public void setCurrentTimeMillis(long currentTimeMillis) {
-        this.currentTimeMillis = currentTimeMillis;
-    }
-
     public long getTimeToEndRound() {
         return timeToEndRound;
     }
-    public void setTimeToEndRound(int timeToEndRound) {
-        this.timeToEndRound = timeToEndRound;
-    }
+
 }

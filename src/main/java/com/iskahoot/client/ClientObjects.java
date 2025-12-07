@@ -30,18 +30,18 @@ public class ClientObjects {
         try {
             connectToServer(ip, port);
             setStreams();
-            sendConnectionMessage(game, team, client);
+            sendConnectionMessage();
             waitMessages();
 
-        } catch (IOException e) {// ERRO ...
+        } catch (IOException e) {
             e.printStackTrace();
         } finally {// a fechar ...
             closeCon();
         }
     }
 
-    private void sendConnectionMessage(String game, String team, String client) {
-        ConnectionMessage connectionMessage = new ConnectionMessage(game, team, client);
+    private void sendConnectionMessage() {
+        ConnectionMessage connectionMessage = new ConnectionMessage(player);
         try {
             out.writeObject(connectionMessage);
         } catch (IOException e) {
@@ -62,61 +62,6 @@ public class ClientObjects {
         out.writeObject(answerFromClient);
         System.out.println("Resposta enviada: " + answerFromClient.getSelectedOptionIndex());
     }
-
-//    private void waitmensages() {
-//        while (true) {
-//            try {
-//                Object obj = in.readObject();
-//                System.out.println("Mensagem recebida pelo cliente: " + obj);
-//                if (obj instanceof QuestionMessage) {
-//                    System.out.println("Tipo: CurrentQuestion recebida pelo cliente");
-//                    QuestionMessage questionMessage = (QuestionMessage) obj;
-//
-//                    if(clientGUI == null) {
-//                        clientGUI = new SimpleClientGUI(questionMessage, "Client 1", (answer) -> {
-//                            try {
-//                                out.writeObject(answer);
-//                                out.flush();
-//                            } catch (IOException e) {
-//                                e.printStackTrace();
-//                            }
-//                        });
-//                    }
-////                    } else {
-////                        clientGUI.di(questionMessage, "Client 1", (answer) -> {
-////                            try {
-////                                out.writeObject(answer);
-////                                out.flush();
-////                            } catch (IOException e) {
-////                                e.printStackTrace();
-////                            }
-////                        });
-////                    }
-//                }
-////                else if (obj instanceof TimeMessage) {
-/// ////                    TimeMessage timeMessage = (TimeMessage) obj;
-/// ////                    long serverTime = timeMessage.getCurrentTimeMillis();
-/// ////                    System.out.println("Hora do servidor: " + serverTime);
-/// ////                    sendConfirmation();
-////
-////                    //TODO  mudar isto para receber info do servidor e nao crirar um quiz no Client
-////                    Quiz quiz = new Quiz(loadFromFile("src/main/resources/questions.json").getName(),
-////                            loadFromFile("src/main/resources/questions.json").getQuestions());
-////
-////                    clientGUI = new SimpleClientGUI(quiz.getQuestions(), "Client 1");
-////                    System.out.println(timeMessage.getTimeToEndRound());
-////                    countdownInGUI((int) timeMessage.getTimeToEndRound());
-////
-////                    sendAnswer();
-////                }
-//            } catch (EOFException e) {
-//                System.out.println("Connection closed by server.");
-//                break;
-//            } catch (IOException | ClassNotFoundException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//    }
 
     private void waitMessages() {
        AnswerListener myAnswerListener = (answerMsg) -> {
@@ -139,7 +84,6 @@ public class ClientObjects {
 
                     if (clientGUI == null) {
                         System.out.println("Criando nova GUI...");
-                        String playerInfo = player.getUsername() + " " + player.getTeamCode() + " " + player.getGameCode();
                         clientGUI = new SimpleClientGUI(questionMessage, player , myAnswerListener);
                     } else {
                         System.out.println("Atualizando GUI existente...");
@@ -148,17 +92,17 @@ public class ClientObjects {
                 }
                 else if (obj instanceof TimeMessage) {
                     TimeMessage timeMessage = (TimeMessage) obj;
-//                    long serverTime = timeMessage.getCurrentTimeMillis();
-//                    System.out.println("Hora do servidor: " + serverTime);
-                    //sendConfirmation();
 
-                    // Converte para segundos se necessário (depende do teu servidor enviar ms ou s)
-                    // Assumindo que TimeMessage traz segundos:
-                    int seconds = (int) timeMessage.getTimeToEndRound();
+                    int totalSeconds = (int) (timeMessage.getTimeToEndRound() / 1000);//30
+                    long timeNow = System.currentTimeMillis();
+                    long latencyMillis = timeNow - timeMessage.getCurrentTimeMillis();
+                    int latencySeconds = (int) (latencyMillis / 1000);
 
-                    // Chama a thread da GUI (NÃO BLOQUEIA ESTE LOOP)
+                    int finalTime = totalSeconds - latencySeconds;
+                    System.out.println("Time left: " + finalTime);
+
                     if (clientGUI != null) {
-                        clientGUI.startTimer(seconds);
+                        clientGUI.startTimer(finalTime);
                     }
                 }
 
@@ -188,20 +132,6 @@ public class ClientObjects {
         System.out.println("Time has run out!");
     }
 
-
-
-
-    void sendConfirmation() throws IOException, ClassNotFoundException {
-        ReceptionConfirmationMessage receptionConfirmationMessage = new ReceptionConfirmationMessage(System.currentTimeMillis());
-        out.writeObject(receptionConfirmationMessage);
-        out.flush();
-        System.out.println("Confirmação enviada!");
-//        long serverSentAt = timeMessage.getCurrentTimeMillis();
-//        long clientReceivedAt = receptionConfirmationMessage.getReceivedAtMillis();
-//        long latency = clientReceivedAt - serverSentAt;
-//        displayedTime = serverSentAt - latency;
-
-    }
     private void setStreams() throws IOException {
         in = new ObjectInputStream(socket.getInputStream());
         out = new ObjectOutputStream(socket.getOutputStream());

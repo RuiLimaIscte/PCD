@@ -94,10 +94,10 @@ public class ClientObjects {
 ////                    }
 //                }
 ////                else if (obj instanceof TimeMessage) {
-////                    TimeMessage timeMessage = (TimeMessage) obj;
-////                    long serverTime = timeMessage.getCurrentTimeMillis();
-////                    System.out.println("Hora do servidor: " + serverTime);
-////                    sendConfirmation();
+/// ////                    TimeMessage timeMessage = (TimeMessage) obj;
+/// ////                    long serverTime = timeMessage.getCurrentTimeMillis();
+/// ////                    System.out.println("Hora do servidor: " + serverTime);
+/// ////                    sendConfirmation();
 ////
 ////                    //TODO  mudar isto para receber info do servidor e nao crirar um quiz no Client
 ////                    Quiz quiz = new Quiz(loadFromFile("src/main/resources/questions.json").getName(),
@@ -146,7 +146,21 @@ public class ClientObjects {
                         clientGUI.updateQuestion(questionMessage);
                     }
                 }
-                // ... (outros ifs para TimeMessage, etc)
+                else if (obj instanceof TimeMessage) {
+                    TimeMessage timeMessage = (TimeMessage) obj;
+//                    long serverTime = timeMessage.getCurrentTimeMillis();
+//                    System.out.println("Hora do servidor: " + serverTime);
+                    //sendConfirmation();
+
+                    // Converte para segundos se necessário (depende do teu servidor enviar ms ou s)
+                    // Assumindo que TimeMessage traz segundos:
+                    int seconds = (int) timeMessage.getTimeToEndRound();
+
+                    // Chama a thread da GUI (NÃO BLOQUEIA ESTE LOOP)
+                    if (clientGUI != null) {
+                        clientGUI.startTimer(seconds);
+                    }
+                }
 
             } catch (EOFException e) {
                 System.out.println("Connection closed by server.");
@@ -187,26 +201,7 @@ public class ClientObjects {
 //        long latency = clientReceivedAt - serverSentAt;
 //        displayedTime = serverSentAt - latency;
 
-//        try {
-//                Thread.sleep ( 3000 );
-//            } catch ( InterruptedException e ) {
-//                e . printStackTrace ();
-//            }
-//
-//        for (int i = 0; i < 10; i ++) {
-//            Mensagem message= new Mensagem(i,"ola");
-//            out.writeObject(message);
-//            Mensagem str = (Mensagem)in.readObject();
-//            System.out.println ( str );
-//            try {
-//                Thread.sleep ( 3000 );
-//            } catch ( InterruptedException e ) {
-//                e . printStackTrace ();
-//            }
-//        }
-//        out.writeObject(new Mensagem(-1,"FIM"));
     }
-
     private void setStreams() throws IOException {
         in = new ObjectInputStream(socket.getInputStream());
         out = new ObjectOutputStream(socket.getOutputStream());

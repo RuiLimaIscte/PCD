@@ -6,7 +6,7 @@ public class TimeMessage implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private long currentTimeMillis;
-    private int timeToEndRound;//TODO usar timesatmp
+    private int timeToEndRound;
 
     public TimeMessage(long currentTimeMillis, int timeToEndRound) {
         this.currentTimeMillis = currentTimeMillis;

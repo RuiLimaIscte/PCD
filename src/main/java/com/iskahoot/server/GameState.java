@@ -2,12 +2,15 @@ package com.iskahoot.server;
 
 import com.iskahoot.common.models.Question;
 import java.io.IOException;
+import java.security.Timestamp;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 public class GameState extends Thread {
+
+    private static final int ROUNDTIME = 30000;
 
     private final Game game; // Instância dos DADOS
     private final List<GameServer.DealWithClient> connectedClients;
@@ -61,20 +64,18 @@ public class GameState extends Thread {
             // Loop pelas perguntas do Quiz (que está na classe Game)
             for (Question q : game.getQuiz().getQuestions()) {
 
-                // 1. Limpar respostas da ronda anterior (CRÍTICO!)
+                // Limpar respostas da ronda anterior
                 synchronized (this) {
                     playersWhoAnswered.clear();
                 }
 
-                // 2. Enviar pergunta
                 broadcastQuestion(q);
 
-                // 3. Esperar: 30 segundos OU até notifyAll() ser chamado
                 synchronized (this) {
-                    // O wait solta o lock e espera.
-                    // Se alguém fizer notifyAll(), ele acorda antes dos 30000ms.
-                    // Se ninguém fizer nada, ele acorda sozinho passados 30000ms.
-                    wait(30000);
+                    broadcastTime(System.currentTimeMillis(), ROUNDTIME);
+                    // Se alguém fizer notifyAll(), ele acorda antes dos 30s
+                    // Se ninguém fizer nada, ele acorda sozinho passados 30s
+                    wait(ROUNDTIME);
                 }
 
                 System.out.println("Tempo esgotado ou todos responderam. Próxima pergunta...");
@@ -107,6 +108,18 @@ public class GameState extends Thread {
                 client.sendQuestion(q);
             } catch (IOException e) {
                 System.out.println("Erro ao enviar para um cliente (talvez desconectou).");
+            }
+        }
+    }
+    private synchronized void broadcastTime(long timestamp, int roundTime) {
+        System.out.println("Enviando time: " + timestamp);
+        for (GameServer.DealWithClient client : connectedClients) {
+            try {
+                client.sendTime(timestamp, roundTime);
+            } catch (IOException e) {
+                System.out.println("Erro ao enviar para um cliente (talvez desconectou).");
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
             }
         }
     }

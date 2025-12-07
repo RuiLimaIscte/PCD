@@ -88,10 +88,10 @@
 //    }
 //
 //    void sendTime() throws IOException, ClassNotFoundException {
-//        TimeMessage timeMessage = new TimeMessage(System.currentTimeMillis(),5);
-//        out.writeObject(timeMessage);
-////        ReceptionConfirmationMessage confirmation = (ReceptionConfirmationMessage) in.readObject();
-////        System.out.println("Confirmação recebida do cliente: " + confirmation.getReceivedAtMillis());
+/// /        TimeMessage timeMessage = new TimeMessage(System.currentTimeMillis(),5);
+/// /        out.writeObject(timeMessage);
+/// ///        ReceptionConfirmationMessage confirmation = (ReceptionConfirmationMessage) in.readObject();
+/// ///        System.out.println("Confirmação recebida do cliente: " + confirmation.getReceivedAtMillis());
 //
 //
 ////        for (int i = 0; i < 10; i ++) {

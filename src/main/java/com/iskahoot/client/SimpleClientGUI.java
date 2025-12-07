@@ -16,6 +16,8 @@ public class SimpleClientGUI extends JFrame {
     private static JLabel timerLabel;
     private JTextArea scoreboardArea;
 
+    private Thread countdownThread;
+
     private QuestionMessage questionMessage;
     private AnswerListener listener;
 
@@ -151,9 +153,54 @@ public class SimpleClientGUI extends JFrame {
         });
     }
 
+    public void startTimer(int totalSeconds) {
+        // 1. Se já existir um contador a correr, pára-o primeiro (para não teres dois a lutar)
+//        stopTimer();
 
+        // 2. Criar uma nova thread para NÃO bloquear a janela
+        countdownThread = new Thread(() -> {
+            int timeLeft = totalSeconds/1000;
+
+            try {
+                while (timeLeft >= 0) {
+
+                    timerLabel.setText("Timer: " + timeLeft);
+
+                    // Muda a cor se faltar pouco tempo (opcional)
+                    if (timeLeft <= 5) {
+                        timerLabel.setForeground(Color.RED);
+                    } else {
+                        timerLabel.setForeground(Color.BLACK);
+                    }
+
+                    Thread.sleep(1000);
+
+                    timeLeft--;
+                }
+
+                // O tempo acabou!
+                timerLabel.setText("Tempo Esgotado!");
+                // Desativar botões, etc...
+
+            } catch (InterruptedException e) {
+                // Se a thread for interrompida (pelo stopTimer), sai do loop calmamente
+                return;
+            }
+        });
+
+        // 3. Iniciar a contagem
+        countdownThread.start();
+    }
+
+    public void stopTimer() {
+        // Se a thread existe e está viva, interrompe o sono dela
+        if (countdownThread != null && countdownThread.isAlive()) {
+            countdownThread.interrupt();
+        }
+    }
 
     private void handleOption(int index) {
+        stopTimer();
 
         selectedOption = index;
 //        waitingForAnswer = false;

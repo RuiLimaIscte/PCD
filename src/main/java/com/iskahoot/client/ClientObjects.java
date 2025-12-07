@@ -63,27 +63,17 @@ public class ClientObjects {
         System.out.println("Resposta enviada: " + answerFromClient.getSelectedOptionIndex());
     }
 
-    private void waitmensages() {
-        while (true) {
-            try {
-                Object obj = in.readObject();
-                System.out.println("Mensagem recebida pelo cliente: " + obj);
-                if (obj instanceof QuestionMessage) {
-                    System.out.println("Tipo: CurrentQuestion recebida pelo cliente");
-                    QuestionMessage questionMessage = (QuestionMessage) obj;
-
-                    if(clientGUI == null) {
-                        clientGUI = new SimpleClientGUI(questionMessage, "Client 1", (answer) -> {
-                            try {
-                                out.writeObject(answer);
-                                out.flush();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        });
-                    }
-//                    } else {
-//                        clientGUI.di(questionMessage, "Client 1", (answer) -> {
+//    private void waitmensages() {
+//        while (true) {
+//            try {
+//                Object obj = in.readObject();
+//                System.out.println("Mensagem recebida pelo cliente: " + obj);
+//                if (obj instanceof QuestionMessage) {
+//                    System.out.println("Tipo: CurrentQuestion recebida pelo cliente");
+//                    QuestionMessage questionMessage = (QuestionMessage) obj;
+//
+//                    if(clientGUI == null) {
+//                        clientGUI = new SimpleClientGUI(questionMessage, "Client 1", (answer) -> {
 //                            try {
 //                                out.writeObject(answer);
 //                                out.flush();
@@ -92,31 +82,41 @@ public class ClientObjects {
 //                            }
 //                        });
 //                    }
-                }
-//                else if (obj instanceof TimeMessage) {
-//                    TimeMessage timeMessage = (TimeMessage) obj;
-//                    long serverTime = timeMessage.getCurrentTimeMillis();
-//                    System.out.println("Hora do servidor: " + serverTime);
-//                    sendConfirmation();
-//
-//                    //TODO  mudar isto para receber info do servidor e nao crirar um quiz no Client
-//                    Quiz quiz = new Quiz(loadFromFile("src/main/resources/questions.json").getName(),
-//                            loadFromFile("src/main/resources/questions.json").getQuestions());
-//
-//                    clientGUI = new SimpleClientGUI(quiz.getQuestions(), "Client 1");
-//                    System.out.println(timeMessage.getTimeToEndRound());
-//                    countdownInGUI((int) timeMessage.getTimeToEndRound());
-//
-//                    sendAnswer();
+////                    } else {
+////                        clientGUI.di(questionMessage, "Client 1", (answer) -> {
+////                            try {
+////                                out.writeObject(answer);
+////                                out.flush();
+////                            } catch (IOException e) {
+////                                e.printStackTrace();
+////                            }
+////                        });
+////                    }
 //                }
-            } catch (EOFException e) {
-                System.out.println("Connection closed by server.");
-                break;
-            } catch (IOException | ClassNotFoundException e) {
-                e.printStackTrace();
-            }
-        }
-    }
+////                else if (obj instanceof TimeMessage) {
+////                    TimeMessage timeMessage = (TimeMessage) obj;
+////                    long serverTime = timeMessage.getCurrentTimeMillis();
+////                    System.out.println("Hora do servidor: " + serverTime);
+////                    sendConfirmation();
+////
+////                    //TODO  mudar isto para receber info do servidor e nao crirar um quiz no Client
+////                    Quiz quiz = new Quiz(loadFromFile("src/main/resources/questions.json").getName(),
+////                            loadFromFile("src/main/resources/questions.json").getQuestions());
+////
+////                    clientGUI = new SimpleClientGUI(quiz.getQuestions(), "Client 1");
+////                    System.out.println(timeMessage.getTimeToEndRound());
+////                    countdownInGUI((int) timeMessage.getTimeToEndRound());
+////
+////                    sendAnswer();
+////                }
+//            } catch (EOFException e) {
+//                System.out.println("Connection closed by server.");
+//                break;
+//            } catch (IOException | ClassNotFoundException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//    }
 
     private void waitMessages() {
        AnswerListener myAnswerListener = (answerMsg) -> {
@@ -140,7 +140,7 @@ public class ClientObjects {
                     if (clientGUI == null) {
                         System.out.println("Criando nova GUI...");
                         String playerInfo = player.getUsername() + " " + player.getTeamCode() + " " + player.getGameCode();
-                        clientGUI = new SimpleClientGUI(questionMessage, playerInfo , myAnswerListener);
+                        clientGUI = new SimpleClientGUI(questionMessage, player , myAnswerListener);
                     } else {
                         System.out.println("Atualizando GUI existente...");
                         clientGUI.updateQuestion(questionMessage);

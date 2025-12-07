@@ -11,7 +11,7 @@ public class Player implements Serializable {
     private String gameCode;
     private int individualScore;
     private boolean hasAnswered;
-    private Integer currentAnswer;  // Indice da sua resposta
+    private Integer currentAnswer;
 
     public Player(String username, String teamCode, String gameCode) {
         this.username = username;

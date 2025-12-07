@@ -62,6 +62,7 @@ public class GameServer {
         private ObjectOutputStream out;
         private ObjectInputStream in;
         private Map<String, GameState> games;
+        private GameState gameState;
 
         public DealWithClient(Socket socket, Map<String, GameState> games) {
             this.socket = socket;
@@ -77,9 +78,10 @@ public class GameServer {
 
                 if (obj instanceof ConnectionMessage) {
                     ConnectionMessage msg = (ConnectionMessage) obj;
-                    GameState gameState;
+//                    GameState gameState;
                     synchronized (games) {
                         gameState = games.get(msg.getGameCode());
+                        games.put(msg.getGameCode(), gameState);
                     }
 
                     if (gameState != null) {
@@ -115,6 +117,17 @@ public class GameServer {
                 // Aqui receberás as respostas dos clientes
                 // Ex: if (obj instanceof AnswerMessage) { ... }
                 System.out.println("Recebi objeto do cliente: " + obj.getClass().getSimpleName());
+                if (obj instanceof QuestionMessage) { // Assumindo que usas QuestionMessage ou AnswerMessage
+                    QuestionMessage resposta = (QuestionMessage) obj;
+                    System.out.println("Resposta: " + resposta.getSelectedAnswerIndex() + " de: " + resposta.getClientCode());
+                    // Vai buscar o GameState atual (já o tens guardado na variável 'gameState' ou no mapa)
+                    // NOTA: Precisas de ter acesso à instância do GameState aqui
+
+                    // AVISA O GAMESTATE QUE CHEGOU UMA RESPOSTA
+                    // Passamos o ID do cliente (para o Set) e a resposta
+                    // Assumindo que msg.getClientCode() está disponível ou guardaste no DealWithClient
+                    gameState.receiveAnswer(resposta.getClientCode(), resposta.getSelectedAnswerIndex());
+                }
             }
         }
 

@@ -1,6 +1,7 @@
 package com.iskahoot.client;
 
 import com.iskahoot.common.messages.QuestionMessage;
+import com.iskahoot.common.models.Player;
 import com.iskahoot.common.models.Question;
 import com.iskahoot.utils.AnswerListener;
 
@@ -29,7 +30,7 @@ public class SimpleClientGUI extends JFrame {
     // private boolean waitingForAnswer = false;
 
 
-    private String clientInfo;
+    private Player player;
 
 
 //    public static void main(String[] args) throws IOException {
@@ -39,13 +40,13 @@ public class SimpleClientGUI extends JFrame {
 //        new SimpleClientGUI(quiz.getQuestions(), "Client 1");
 //    }
 
-    public SimpleClientGUI(QuestionMessage questionMessage, String clientInfo, AnswerListener listener) {
+    public SimpleClientGUI(QuestionMessage questionMessage, Player clientInfo, AnswerListener listener) {
 
         this.questionMessage = questionMessage;
-        this.clientInfo = clientInfo;
+        this.player = clientInfo;
         this.listener = listener;
 
-        setTitle(clientInfo);
+        setTitle("Kahoot Client - " + player.getUsername() + " " + player.getTeamCode() + " " + player.getGameCode() );
         setSize(700, 300);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -169,6 +170,7 @@ public class SimpleClientGUI extends JFrame {
         if (questionMessage != null && listener != null) {
             // 1. O Cliente PREENCHE o campo vazio
             questionMessage.setSelectedAnswerIndex(index);
+            questionMessage.setClientCode(player.getUsername());
             // 2. Envia o objeto modificado de volta via Callback
             listener.onAnswerSelected(questionMessage);
         }

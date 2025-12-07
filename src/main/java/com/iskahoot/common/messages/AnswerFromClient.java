@@ -13,10 +13,6 @@ public class AnswerFromClient implements Serializable {
         this.selectedOptionIndex = selectedOptionIndex;
     }
 
-//    public int getQuestionId() {
-//        return questionId;
-//    }
-
     public int getSelectedOptionIndex() {
         return selectedOptionIndex;
     }

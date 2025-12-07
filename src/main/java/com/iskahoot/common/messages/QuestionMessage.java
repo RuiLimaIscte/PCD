@@ -3,14 +3,14 @@ package com.iskahoot.common.messages;
 import java.io.Serializable;
 import java.util.List;
 
-public class CurrentQuestion implements Serializable {
+public class QuestionMessage implements Serializable {
 
     private String questionText;
     private List<String> options;
 
     private Integer selectedAnswerIndex = null;
 
-    public CurrentQuestion(String questionText, List<String> options) {
+    public QuestionMessage(String questionText, List<String> options) {
         this.questionText = questionText;
         this.options = options;
     }

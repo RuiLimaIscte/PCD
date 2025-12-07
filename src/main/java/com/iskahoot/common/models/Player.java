@@ -8,13 +8,15 @@ public class Player implements Serializable {
 
     private String username;
     private String teamCode;
+    private String gameCode;
     private int individualScore;
     private boolean hasAnswered;
     private Integer currentAnswer;  // Indice da sua resposta
 
-    public Player(String username, String teamCode) {
+    public Player(String username, String teamCode, String gameCode) {
         this.username = username;
         this.teamCode = teamCode;
+        this.gameCode = gameCode;
         this.individualScore = 0;
         this.hasAnswered = false;
         this.currentAnswer = null;
@@ -26,6 +28,10 @@ public class Player implements Serializable {
 
     public String getTeamCode() {
         return teamCode;
+    }
+
+    public String getGameCode() {
+        return gameCode;
     }
 
     public void addScore(int points) {

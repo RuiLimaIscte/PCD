@@ -1,17 +1,12 @@
 package com.iskahoot.client;
 
-import com.iskahoot.common.messages.CurrentQuestion;
+import com.iskahoot.common.messages.QuestionMessage;
 import com.iskahoot.common.models.Question;
-import com.iskahoot.common.models.Quiz;
 import com.iskahoot.utils.AnswerListener;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionListener;
-import java.io.IOException;
 import java.util.List;
-
-import static com.iskahoot.utils.QuestionLoader.loadFromFile;
 
 public class SimpleClientGUI extends JFrame {
 
@@ -20,7 +15,7 @@ public class SimpleClientGUI extends JFrame {
     private static JLabel timerLabel;
     private JTextArea scoreboardArea;
 
-    private CurrentQuestion currentQuestion;
+    private QuestionMessage questionMessage;
     private AnswerListener listener;
 
     private List<Question> questions;
@@ -31,7 +26,7 @@ public class SimpleClientGUI extends JFrame {
     }
 
     private int selectedOption = -1;
-   // private boolean waitingForAnswer = false;
+    // private boolean waitingForAnswer = false;
 
 
     private String clientInfo;
@@ -44,9 +39,9 @@ public class SimpleClientGUI extends JFrame {
 //        new SimpleClientGUI(quiz.getQuestions(), "Client 1");
 //    }
 
-    public SimpleClientGUI(CurrentQuestion currentQuestion, String clientInfo, AnswerListener listener) {
+    public SimpleClientGUI(QuestionMessage questionMessage, String clientInfo, AnswerListener listener) {
 
-        this.currentQuestion = currentQuestion;
+        this.questionMessage = questionMessage;
         this.clientInfo = clientInfo;
         this.listener = listener;
 
@@ -58,7 +53,7 @@ public class SimpleClientGUI extends JFrame {
 
         buildGUI();
 
-        displayQuestion(currentQuestion);
+        displayQuestion(questionMessage);
 //        if (questions != null && !questions.isEmpty()) {
 //            displayQuestion(questions.get(0));
 //        }
@@ -108,17 +103,32 @@ public class SimpleClientGUI extends JFrame {
         add(sidePanel, BorderLayout.EAST);
     }
 
-    private void displayQuestion(CurrentQuestion p) {
-        questionLabel.setText(p.getQuestionText());
+    private void displayQuestion(QuestionMessage questionMessage) {
+        questionLabel.setText(questionMessage.getQuestionText());
         for (int i = 0; i < 4; i++) {
-            optionButtons[i].setText(p.getOptions().get(i));
+            optionButtons[i].setText(questionMessage.getOptions().get(i));
         }
     }
 
+    public void updateQuestion(QuestionMessage newQuestionMessage) {
+        this.questionMessage = newQuestionMessage;
+
+        questionLabel.setText(newQuestionMessage.getQuestionText());
+
+        for (int i = 0; i < 4; i++) {
+            optionButtons[i].setText(newQuestionMessage.getOptions().get(i));
+            optionButtons[i].setBackground(null);
+            optionButtons[i].setEnabled(true);
+        }
+
+        timerLabel.setText("Timer: 30");
+
+        System.out.println("GUI atualizada com nova pergunta.");
+    }
 
 //    private void displayQuestion(Question q) {
 //
-////        waitingForAnswer = true;
+    ////        waitingForAnswer = true;
 //        selectedOption = -1;
 //
 //        questionLabel.setText(q.getQuestion());
@@ -156,11 +166,11 @@ public class SimpleClientGUI extends JFrame {
                 optionButtons[i].setBackground(Color.GREEN);
             }
         }
-        if (currentQuestion != null && listener != null) {
+        if (questionMessage != null && listener != null) {
             // 1. O Cliente PREENCHE o campo vazio
-            currentQuestion.setSelectedAnswerIndex(index);
+            questionMessage.setSelectedAnswerIndex(index);
             // 2. Envia o objeto modificado de volta via Callback
-            listener.onAnswerSelected(currentQuestion);
+            listener.onAnswerSelected(questionMessage);
         }
         System.out.println("Selected: " + index);
     }

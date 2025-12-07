@@ -1,21 +1,19 @@
 package com.iskahoot.client;
 
 import com.iskahoot.common.messages.*;
-import com.iskahoot.common.models.Quiz;
+import com.iskahoot.common.models.Player;
 import com.iskahoot.utils.AnswerListener;
 
 import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
 
-import static com.iskahoot.utils.QuestionLoader.loadFromFile;
-
 public class ClientObjects {
     private ObjectInputStream in;
     private ObjectOutputStream out;
     private Socket socket;
     private SimpleClientGUI clientGUI;
-
+    private Player player;
 
     public static void main(String[] args) {
         String ip = args[0];
@@ -27,11 +25,13 @@ public class ClientObjects {
     }
 
     public void runClient(String ip, int port, String game, String team, String client) {
+        player = new Player(client, team, game);
+
         try {
             connectToServer(ip, port);
             setStreams();
             sendConnectionMessage(game, team, client);
-            waitmensages();
+            waitMessages();
 
         } catch (IOException e) {// ERRO ...
             e.printStackTrace();
@@ -68,18 +68,30 @@ public class ClientObjects {
             try {
                 Object obj = in.readObject();
                 System.out.println("Mensagem recebida pelo cliente: " + obj);
-                if (obj instanceof CurrentQuestion) {
+                if (obj instanceof QuestionMessage) {
                     System.out.println("Tipo: CurrentQuestion recebida pelo cliente");
-                    CurrentQuestion currentQuestion = (CurrentQuestion) obj;
+                    QuestionMessage questionMessage = (QuestionMessage) obj;
 
-                    clientGUI = new SimpleClientGUI(currentQuestion, "Client 1", (answer) -> {
-                        try {
-                            out.writeObject(answer);
-                            out.flush();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    });
+                    if(clientGUI == null) {
+                        clientGUI = new SimpleClientGUI(questionMessage, "Client 1", (answer) -> {
+                            try {
+                                out.writeObject(answer);
+                                out.flush();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        });
+                    }
+//                    } else {
+//                        clientGUI.di(questionMessage, "Client 1", (answer) -> {
+//                            try {
+//                                out.writeObject(answer);
+//                                out.flush();
+//                            } catch (IOException e) {
+//                                e.printStackTrace();
+//                            }
+//                        });
+//                    }
                 }
 //                else if (obj instanceof TimeMessage) {
 //                    TimeMessage timeMessage = (TimeMessage) obj;
@@ -102,6 +114,46 @@ public class ClientObjects {
                 break;
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
+            }
+        }
+    }
+
+    private void waitMessages() {
+       AnswerListener myAnswerListener = (answerMsg) -> {
+            try {
+                out.writeObject(answerMsg);
+                out.flush();
+                System.out.println("Resposta enviada para a pergunta: " + answerMsg.getQuestionText());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        };
+
+        while (true) {
+            try {
+                Object obj = in.readObject();
+                System.out.println("Mensagem recebida pelo cliente: " + obj.getClass().getSimpleName());
+
+                if (obj instanceof QuestionMessage) {
+                    QuestionMessage questionMessage = (QuestionMessage) obj;
+
+                    if (clientGUI == null) {
+                        System.out.println("Criando nova GUI...");
+                        String playerInfo = player.getUsername() + " " + player.getTeamCode() + " " + player.getGameCode();
+                        clientGUI = new SimpleClientGUI(questionMessage, playerInfo , myAnswerListener);
+                    } else {
+                        System.out.println("Atualizando GUI existente...");
+                        clientGUI.updateQuestion(questionMessage);
+                    }
+                }
+                // ... (outros ifs para TimeMessage, etc)
+
+            } catch (EOFException e) {
+                System.out.println("Connection closed by server.");
+                break;
+            } catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace();
+                break;
             }
         }
     }

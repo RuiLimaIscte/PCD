@@ -1,13 +1,12 @@
 package com.iskahoot.server;
 
 import com.iskahoot.common.messages.ConnectionMessage;
-import com.iskahoot.common.messages.CurrentQuestion;
+import com.iskahoot.common.messages.QuestionMessage;
 import com.iskahoot.common.models.Question;
 
 import java.io.*;
 import java.net.*;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class GameServer {
     private int port = 8080;
@@ -121,7 +120,7 @@ public class GameServer {
 
 
         public void sendQuestion(Question q) throws IOException {
-            out.writeObject(new CurrentQuestion(q.getQuestion(), q.getOptions()));
+            out.writeObject(new QuestionMessage(q.getQuestion(), q.getOptions()));
             out.flush();
             System.out.println("Enviado pergunta ao cliente.");
         }

@@ -1,11 +1,11 @@
 package com.iskahoot.server;
 
+import com.iskahoot.common.models.Player;
 import com.iskahoot.common.models.Quiz;
+import com.iskahoot.common.models.Team;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.iskahoot.utils.QuestionLoader.loadFromFile;
 
@@ -22,7 +22,7 @@ public class Game {
     private final Quiz quiz;
     private final int numberOfTeams;
     private final int playersPerTeam;
-    private Map<String, Set<String>> playersByTeam;
+    private List<Team> teams = new ArrayList<>();
     private int currentQuestionIndex;
     private STATUS status;
 
@@ -31,19 +31,44 @@ public class Game {
         this.numberOfTeams = numberOfTeams;
         this.playersPerTeam = playersPerTeam;
         this.quiz = loadFromFile("src/main/resources/questions.json");
-        this.playersByTeam = new HashMap<>();
         this.currentQuestionIndex = 0;
         this.status = STATUS.WAITING;
     }
 
     public synchronized void addPlayer(String teamCode, String playerCode) {
-        playersByTeam.computeIfAbsent(teamCode, k -> new HashSet<>()).add(playerCode);
+        Team team = getTeam(teamCode);
+
+        // Se não existe, cria e adiciona à lista
+        if (team == null) {
+            team = new Team(teamCode);
+            teams.add(team);
+        }
+
+        // Adiciona o jogador (Team.java já tem lógica para não exceder MAX_PLAYERS)
+        Player newPlayer = new Player(playerCode, teamCode, gameCode);
+        boolean added = team.addPlayer(newPlayer);
+
+        if (added) {
+            System.out.println("Adicionado " + playerCode + " à equipa " + teamCode);
+        } else {
+            System.out.println("Equipa cheia! Não foi possível adicionar " + playerCode);
+        }
 
         // Check if room is ready to start
         if (isGameFull()) {
             status = STATUS.READY;
             System.out.println("Room " + gameCode + " is ready to start!");
         }
+    }
+    public Team getTeam(String teamCode) {
+        synchronized (teams) { // Proteção para iteração
+            for (Team t : teams) {
+                if (t.getTeamCode().equals(teamCode)) { //
+                    return t;
+                }
+            }
+        }
+        return null;
     }
 
     public synchronized boolean canStartGame() {
@@ -60,9 +85,18 @@ public class Game {
     }
 
     public boolean isGameFull() {
-        return getConnectedPlayers() >= getExpectedPlayers();
+        return getConnectedPlayersCount() >= getExpectedPlayers();
     }
 
+    public List<Team> getTeams() {
+        return teams;
+    }
+    public Map<String, Integer> getTeamScoresMap() {
+        synchronized (teams) {
+            return teams.stream()
+                    .collect(Collectors.toMap(Team::getTeamCode, Team::getTeamScore));
+        }
+    }
     public String getGameCode() {
         return gameCode;
     }
@@ -75,8 +109,10 @@ public class Game {
         return numberOfTeams * playersPerTeam;
     }
 
-    public int getConnectedPlayers() {
-        return playersByTeam.values().stream().mapToInt(Set::size).sum();
+    public int getConnectedPlayersCount() {
+        synchronized (teams) {
+            return teams.stream().mapToInt(Team::getPlayerCount).sum(); //
+        }
     }
 
     public STATUS getStatus() {

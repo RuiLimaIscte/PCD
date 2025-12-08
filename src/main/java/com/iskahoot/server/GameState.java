@@ -1,6 +1,9 @@
 package com.iskahoot.server;
 
+import com.iskahoot.common.models.Player;
 import com.iskahoot.common.models.Question;
+import com.iskahoot.common.models.Team;
+
 import java.io.IOException;
 import java.security.Timestamp;
 import java.util.ArrayList;
@@ -98,6 +101,16 @@ public class GameState extends Thread {
             System.out.println("Todos responderam! Avançando...");
             notifyAll();
         }
+
+    }
+    private Player findPlayer(String clientCode) {
+        // Como teams agora é uma List<Team>, iteramos diretamente
+        for (Team t : game.getTeams()) {
+            for (Player p : t.getPlayers()) { //
+                if (p.getPlayerCode().equals(clientCode)) return p; //
+            }
+        }
+        return null;
     }
     private synchronized void broadcastQuestion(Question q) {
         System.out.println("Enviando pergunta: " + q.getQuestion());

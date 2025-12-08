@@ -1,103 +1,82 @@
 package com.iskahoot.server;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 public class ModifiedCountdownLatch {
     private final int bonusFactor;
     private final int bonusCount;
-    private final int waitPeriod;
+    private final long waitPeriodMillis; // Alterado para long para suportar milissegundos corretamente
 
     private int remaining;
-    private int answered = 0;
+    private int answeredCount = 0;
     private boolean finished = false;
+    private Timer timer;
 
-
-    public ModifiedCountdownLatch(int bonusFactor, int bonusCount, int waitPeriod, int count) {
-
+    public ModifiedCountdownLatch(int bonusFactor, int bonusCount, int waitPeriodMillis, int totalCount) {
         this.bonusFactor = bonusFactor;
         this.bonusCount = bonusCount;
-        this.waitPeriod = waitPeriod;
-        this.remaining = count;
-
-
+        this.waitPeriodMillis = waitPeriodMillis;
+        this.remaining = totalCount;
     }
-//
-//    public synchronized int countdown() {
-//        return 0;
-//    }
-//
-//    public synchronized void await() throws InterruptedException {
-//
-//    }
+
     /**
      * Invocado por uma thread quando o jogador envia a resposta.
-     * Retorna:
-     *  - bonusFactor para os primeiros bonusCount respondentes,
-     *  - 1 para os restantes (se ainda dentro do período),
-     *  - 0 se a ronda já tiver terminado (timeout ou todos responderam).
-     *
-     * Regras de sincronização: threads podem chamar countdown() concorrentemente.
+     * Retorna o multiplicador de pontuação.
      */
     public synchronized int countdown() {
-        // Se já terminou, rejeita (resposta fora do prazo)
         if (finished) {
-            return 0;
+            return 0; // Se acabou o tempo, a resposta não conta (ou conta 0)
         }
 
-        // contabiliza a resposta na ordem de chegada
-        answered++;
-        int multiplier = (answered <= bonusCount) ? bonusFactor : 1;
-
-        // decrementa restantes
         remaining--;
+        answeredCount++;
 
-        // se chegamos a 0 restantes, libertamos todos (termina antes do timeout)
+        // Verifica se está dentro dos primeiros N para receber bónus
+        int multiplier = (answeredCount <= bonusCount) ? bonusFactor : 1;
+
+        // Se todos responderam, abre a barreira
         if (remaining <= 0) {
-            releaseAll();
+            finish();
         }
 
         return multiplier;
     }
 
     /**
-     * Aguarda até que a latch seja libertada (todos responderam ou timeout).
-     * Inicia o temporizador se ainda não tiver sido iniciado.
+     * A thread do jogo (GameState) espera aqui.
      */
-//    public synchronized void await() throws InterruptedException {
-//        startTimerIfNeeded();
-//
-//        while (!finished) {
-//            wait();
-//        }
-//    }
+    public synchronized void await() throws InterruptedException {
+        // Inicia o timer apenas quando começamos a esperar
+        startTimer();
 
-    // inicia o timer do waitPeriod (apenas uma vez). O timer faz releaseAll() quando expira.
-//    private synchronized void startTimerIfNeeded() {
-//        if (timerStarted) return;
-//        timerStarted = true;
-//
-//        Thread timer = new Thread(() -> {
-//            try {
-//                Thread.sleep(waitPeriodMillis);
-//            } catch (InterruptedException ignored) {
-//                // se for interrompido, saímos sem forçar release (em geral não vamos interromper o timer)
-//            }
-//
-//            synchronized (ModifiedCountdownLatch.this) {
-//                // se ainda não terminou, termina por timeout
-//                if (!finished) {
-//                    releaseAll();
-//                }
-//            }
-//        });
-//
-//        timer.setDaemon(true);
-//        timer.start();
-//    }
-
-    // liberta a latch e notifica todas as threads em await()
-    private synchronized void releaseAll() {
-        if (!finished) {
-            finished = true;
-            notifyAll();
+        while (!finished) {
+            wait();
         }
+
+        // Garante que o timer pára se todos responderem antes do tempo
+        if (timer != null) {
+            timer.cancel();
+        }
+    }
+
+    private void startTimer() {
+        timer = new Timer(true);
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                synchronized (ModifiedCountdownLatch.this) {
+                    if (!finished) {
+                        System.out.println("Tempo esgotado (Latch)!");
+                        finish();
+                    }
+                }
+            }
+        }, waitPeriodMillis);
+    }
+
+    private void finish() {
+        finished = true;
+        notifyAll(); // Acorda o GameState
     }
 }

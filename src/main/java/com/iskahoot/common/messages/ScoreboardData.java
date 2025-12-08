@@ -3,21 +3,19 @@ package com.iskahoot.common.messages;
 import java.io.Serializable;
 import java.util.Map;
 
-/**
- * Message payload for scoreboard updates
- */
+
 public class ScoreboardData implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private Map<String, Integer> teamScores;  // teamCode -> score
-    private Map<String, Integer> roundScores; // teamCode -> points earned this round
+    private Map<String, Integer> teamScores;  // teamCode - score
+    private Map<String, Integer> lastRoundScores; // teamCode - points earned last round
     private int currentRound;
     private int totalRounds;
 
-    public ScoreboardData(Map<String, Integer> teamScores, Map<String, Integer> roundScores,
+    public ScoreboardData(Map<String, Integer> teamScores, Map<String, Integer> lastRoundScores,
                          int currentRound, int totalRounds) {
         this.teamScores = teamScores;
-        this.roundScores = roundScores;
+        this.lastRoundScores = lastRoundScores;
         this.currentRound = currentRound;
         this.totalRounds = totalRounds;
     }
@@ -26,8 +24,8 @@ public class ScoreboardData implements Serializable {
         return teamScores;
     }
 
-    public Map<String, Integer> getRoundScores() {
-        return roundScores;
+    public Map<String, Integer> getLastRoundScores() {
+        return lastRoundScores;
     }
 
     public int getCurrentRound() {

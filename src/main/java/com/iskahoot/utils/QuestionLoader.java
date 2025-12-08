@@ -21,6 +21,12 @@ public class QuestionLoader {
             try {
                 jsonReader = readDataFromFile(filePath);
                 Quiz quiz = gson.fromJson(jsonReader, Quiz.class);
+                for(Question question : quiz.getQuestions()){
+//                    if(Math.random() < 0.5) question.setType("individual");
+//                    else question.setType("team");
+                    question.setType("team");
+                    System.out.println(question.getType());
+                }
                 return quiz;
 
             } catch (FileNotFoundException e) {

@@ -23,7 +23,6 @@ public class Game {
     private final int numberOfTeams;
     private final int playersPerTeam;
     private List<Team> teams = new ArrayList<>();
-    private int currentQuestionIndex;
     private STATUS status;
 
     public Game(String gameCode, int numberOfTeams, int playersPerTeam) {
@@ -31,7 +30,6 @@ public class Game {
         this.numberOfTeams = numberOfTeams;
         this.playersPerTeam = playersPerTeam;
         this.quiz = loadFromFile("src/main/resources/questions.json");
-        this.currentQuestionIndex = 0;
         this.status = STATUS.WAITING;
     }
 
@@ -60,6 +58,7 @@ public class Game {
             System.out.println("Room " + gameCode + " is ready to start!");
         }
     }
+
     public Team getTeam(String teamCode) {
         synchronized (teams) { // Proteção para iteração
             for (Team t : teams) {
@@ -127,8 +126,6 @@ public class Game {
         return quiz;
     }
 
-    public int getCurrentQuestionIndex() {
-        return currentQuestionIndex;
-    }
+
 }
 

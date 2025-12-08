@@ -10,12 +10,16 @@ public class QuestionMessage implements Serializable {
     private String clientCode;
 
     private String questionText;
+    private String questionType;
     private List<String> options;
+
 
     private Integer selectedAnswerIndex = null;
 
-    public QuestionMessage(String questionText, List<String> options) {
+    public QuestionMessage(String questionText, String questionType, List<String> options) {
         this.questionText = questionText;
+        this.questionType = questionType;
+        System.out.println(questionType);
         this.options = options;
     }
 
@@ -29,6 +33,10 @@ public class QuestionMessage implements Serializable {
 
     public Integer getSelectedAnswerIndex() {
         return selectedAnswerIndex;
+    }
+
+    public String getQuestionType() {
+        return questionType;
     }
 
     public void setSelectedAnswerIndex(Integer index) {

@@ -6,7 +6,7 @@ import java.util.TimerTask;
 public class ModifiedCountdownLatch {
     private final int bonusFactor;
     private final int bonusCount;
-    private final long waitPeriodMillis; // Alterado para long para suportar milissegundos corretamente
+    private final long waitPeriodMillis;
 
     private int remaining;
     private int answeredCount = 0;
@@ -21,12 +21,12 @@ public class ModifiedCountdownLatch {
     }
 
     /**
-     * Invocado por uma thread quando o jogador envia a resposta.
-     * Retorna o multiplicador de pontuação.
+     * Invocado quando o jogador envia a resposta.
+     * Retorna o multiplicador de pontuação (ex: 2 para os primeiros, 1 para os restantes).
      */
     public synchronized int countdown() {
         if (finished) {
-            return 0; // Se acabou o tempo, a resposta não conta (ou conta 0)
+            return 0;
         }
 
         remaining--;
@@ -35,7 +35,7 @@ public class ModifiedCountdownLatch {
         // Verifica se está dentro dos primeiros N para receber bónus
         int multiplier = (answeredCount <= bonusCount) ? bonusFactor : 1;
 
-        // Se todos responderam, abre a barreira
+        // Se todos responderam, podemos marcar como terminado (opcional para a lógica de bónus, mas útil para fluxo)
         if (remaining <= 0) {
             finish();
         }
@@ -44,20 +44,14 @@ public class ModifiedCountdownLatch {
     }
 
     /**
-     * A thread do jogo (GameState) espera aqui.
+     * A thread do jogo pode esperar aqui (opcional, pois o GameState usa o seu próprio wait)
      */
     public synchronized void await() throws InterruptedException {
-        // Inicia o timer apenas quando começamos a esperar
         startTimer();
-
-        while (!finished) {
+        while (!finished && remaining > 0) {
             wait();
         }
-
-        // Garante que o timer pára se todos responderem antes do tempo
-        if (timer != null) {
-            timer.cancel();
-        }
+        if (timer != null) timer.cancel();
     }
 
     private void startTimer() {
@@ -66,17 +60,14 @@ public class ModifiedCountdownLatch {
             @Override
             public void run() {
                 synchronized (ModifiedCountdownLatch.this) {
-                    if (!finished) {
-                        System.out.println("Tempo esgotado (Latch)!");
-                        finish();
-                    }
+                    finish();
                 }
             }
         }, waitPeriodMillis);
     }
 
-    private void finish() {
+    private synchronized void finish() {
         finished = true;
-        notifyAll(); // Acorda o GameState
+        notifyAll();
     }
 }

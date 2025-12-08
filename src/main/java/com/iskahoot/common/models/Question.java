@@ -66,11 +66,11 @@ public class Question implements Serializable {
     }
 
     public boolean isIndividual() {
-        return "individual".equalsIgnoreCase(type);
+        return type.equalsIgnoreCase("individual");
     }
 
     public boolean isTeam() {
-        return "team".equalsIgnoreCase(type);
+        return type.equalsIgnoreCase("team");
     }
 
     @Override
@@ -78,7 +78,9 @@ public class Question implements Serializable {
         return "Question{" +
                 "question='" + question + '\'' +
                 ", points=" + points +
+                ", correct=" + correct +
                 ", type='" + type + '\'' +
+                ", options=" + options +
                 '}';
     }
 }

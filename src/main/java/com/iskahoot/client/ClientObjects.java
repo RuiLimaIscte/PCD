@@ -105,6 +105,15 @@ public class ClientObjects {
                         clientGUI.startTimer(finalTime);
                     }
                 }
+                else if (obj instanceof ScoreboardData) {
+                    ScoreboardData sbData = (ScoreboardData) obj;
+                    System.out.println("Scoreboard recebido: " + sbData);
+
+                    if (clientGUI != null) {
+                        clientGUI.updateScoreboard(sbData);
+                    }
+                }
+
 
             } catch (EOFException e) {
                 System.out.println("Connection closed by server.");

@@ -19,6 +19,7 @@ public class Quiz implements Serializable {
     public Quiz(String name, List<Question> questions) {
         this.name = name;
         this.questions = questions;
+
     }
 
     public String getName() {
@@ -37,12 +38,9 @@ public class Quiz implements Serializable {
         this.questions = questions;
     }
 
-    @Override
-    public String toString() {
-        return "Quiz{" +
-                "name='" + name + '\'' +
-                ", questions=" + questions.size() +
-                '}';
+    public Question getQuestion(int index) {
+        return questions.get(index);
     }
+
 }
 

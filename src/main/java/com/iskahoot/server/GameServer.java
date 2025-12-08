@@ -2,6 +2,7 @@ package com.iskahoot.server;
 
 import com.iskahoot.common.messages.ConnectionMessage;
 import com.iskahoot.common.messages.QuestionMessage;
+import com.iskahoot.common.messages.ScoreboardData;
 import com.iskahoot.common.messages.TimeMessage;
 import com.iskahoot.common.models.Question;
 
@@ -128,10 +129,16 @@ public class GameServer {
         }
 
         public void sendQuestion(Question q) throws IOException {
-            out.writeObject(new QuestionMessage(q.getQuestion(), q.getOptions()));
+            out.writeObject(new QuestionMessage(q.getQuestion(),q.getType(), q.getOptions()));
             out.flush();
             System.out.println("Enviado pergunta ao cliente.");
         }
+
+        public void sendScoreboard(ScoreboardData data) throws IOException {
+            out.writeObject(data);
+            out.flush();
+        }
+
 
         public void sendTime(long timestamp, int roundTime) throws IOException, ClassNotFoundException {
             TimeMessage timeMessage = new TimeMessage(timestamp, roundTime);

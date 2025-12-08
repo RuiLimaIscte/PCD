@@ -1,6 +1,7 @@
 package com.iskahoot.client;
 
 import com.iskahoot.common.messages.QuestionMessage;
+import com.iskahoot.common.messages.ScoreboardData;
 import com.iskahoot.common.models.Player;
 import com.iskahoot.common.models.Question;
 import com.iskahoot.utils.AnswerListener;
@@ -8,6 +9,7 @@ import com.iskahoot.utils.AnswerListener;
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
+import java.util.Map;
 
 public class SimpleClientGUI extends JFrame {
 
@@ -48,7 +50,7 @@ public class SimpleClientGUI extends JFrame {
         this.player = clientInfo;
         this.listener = listener;
 
-        setTitle("Kahoot Client - " + player.getPlayerCode() + " " + player.getTeamCode() + " " + player.getGameCode() );
+        setTitle("Kahoot Client - " + player.getPlayerCode() + " " + player.getTeamCode() + " " + player.getGameCode() + " " + questionMessage.getQuestionType() );
         setSize(700, 300);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -113,6 +115,35 @@ public class SimpleClientGUI extends JFrame {
         }
     }
 
+    public void updateScoreboard(ScoreboardData data) {
+        SwingUtilities.invokeLater(() -> {
+            StringBuilder sb = new StringBuilder();
+
+            // Cabeçalho da Ronda
+            sb.append("=== RONDA ").append(data.getCurrentRound())
+                    .append("/").append(data.getTotalRounds()).append(" ===\n\n");
+
+            // Itera sobre as equipas ordenando por pontuação total
+            data.getTeamScores().entrySet().stream()
+                    .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
+                    .forEach(entry -> {
+                        String team = entry.getKey();
+                        int totalScore = entry.getValue();
+
+                        // Obtém os pontos da última ronda (seguro contra nulls)
+                        int lastRoundScore = data.getLastRoundScores().getOrDefault(team, 0);
+
+                        // Formatação pedida: "Equipa: Score: X | LastRound: Y"
+                        sb.append(team).append("\n")
+                                .append("   Score: ").append(totalScore)
+                                .append(" | LastRound: ").append(lastRoundScore)
+                                .append("\n\n"); // Duplo \n para separar visualmente as equipas
+                    });
+
+            scoreboardArea.setText(sb.toString());
+        });
+    }
+
     public void updateQuestion(QuestionMessage newQuestionMessage) {
         this.questionMessage = newQuestionMessage;
 
@@ -124,7 +155,9 @@ public class SimpleClientGUI extends JFrame {
             optionButtons[i].setEnabled(true);
         }
 
-        timerLabel.setText("Timer: 30");
+        timerLabel.setText("Timer: 30"); //
+        //Update title with question type
+        setTitle("Kahoot Client - " + player.getPlayerCode() + " " + player.getTeamCode() + " " + player.getGameCode() + " " + questionMessage.getQuestionType() );
 
         System.out.println("GUI atualizada com nova pergunta.");
     }

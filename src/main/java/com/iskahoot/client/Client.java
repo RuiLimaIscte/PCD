@@ -1,204 +1,165 @@
 package com.iskahoot.client;
 
 import com.iskahoot.common.messages.*;
+import com.iskahoot.common.models.Player;
+import com.iskahoot.utils.AnswerListener;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
+import java.net.InetAddress;
 import java.net.Socket;
 
-/**
- * Client application for IsKahoot game
- * Connects to server and handles game interaction
- */
-//public class Client {
-//    private final String serverHost;
-//    private final int serverPort;
-//    private final String roomCode;
-//    private final String teamCode;
-//    private final String username;
-//
-//    private Socket socket;
-//    private ObjectOutputStream out;
-//    private ObjectInputStream in;
-//    private ClientGUI gui;
-//    private volatile boolean connected;
-//
-//    public Client(String serverHost, int serverPort, String roomCode,
-//                 String teamCode, String username) {
-//        this.serverHost = serverHost;
-//        this.serverPort = serverPort;
-//        this.roomCode = roomCode;
-//        this.teamCode = teamCode;
-//        this.username = username;
-//        this.connected = false;
-//    }
-//
-//    /**
-//     * Connect to server and join room
-//     */
-//    public boolean connect() {
-//        try {
-//            // Connect to server
-//            socket = new Socket(serverHost, serverPort);
-//            out = new ObjectOutputStream(socket.getOutputStream());
-//            out.flush();
-//            in = new ObjectInputStream(socket.getInputStream());
-//
-//            System.out.println("Connected to server: " + serverHost + ":" + serverPort);
-//
-//            // Send join request
-//            JoinRequest joinRequest = new JoinRequest(roomCode, teamCode, username);
-//            Message joinMessage = new Message(Message.MessageType.JOIN_ROOM, joinRequest);
-//            out.writeObject(joinMessage);
-//            out.flush();
-//
-//            // Wait for response
-//            Message response = (Message) in.readObject();
-//
-//            if (response.getType() == Message.MessageType.JOIN_ACCEPTED) {
-//                connected = true;
-//                System.out.println("Joined room successfully!");
-//                System.out.println("Message: " + response.getPayload());
-//
-//                // Start message listener thread
-//                Thread listenerThread = new Thread(this::listenForMessages);
-//                listenerThread.setDaemon(true);
-//                listenerThread.start();
-//
-//                return true;
-//            } else {
-//                System.err.println("Join rejected: " + response.getPayload());
-//                return false;
-//            }
-//
-//        } catch (IOException | ClassNotFoundException e) {
-//            System.err.println("Connection failed: " + e.getMessage());
-//            return false;
-//        }
-//    }
-//
-//    /**
-//     * Listen for messages from server
-//     */
-//    private void listenForMessages() {
-//        try {
-//            while (connected) {
-//                Message message = (Message) in.readObject();
-//                handleMessage(message);
-//            }
-//        } catch (IOException | ClassNotFoundException e) {
-//            if (connected) {
-//                System.err.println("Connection lost: " + e.getMessage());
-//                connected = false;
-//            }
-//        }
-//    }
-//
-//    /**
-//     * Handle incoming message from server
-//     */
-//    private void handleMessage(Message message) {
-//        switch (message.getType()) {
-//            case GAME_STARTING:
-//                System.out.println("Game is starting!");
-//                // TODO: Update GUI
-//                break;
-//
-//            case QUESTION_BROADCAST:
-//                System.out.println("New question received");
-//                // TODO: Display question in GUI
-//                break;
-//
-//            case SCOREBOARD_UPDATE:
-//                System.out.println("Scoreboard updated");
-//                // TODO: Update scoreboard in GUI
-//                break;
-//
-//            case ROUND_ENDED:
-//                System.out.println("Round ended");
-//                // TODO: Show round results
-//                break;
-//
-//            case GAME_ENDED:
-//                System.out.println("Game ended!");
-//                // TODO: Show final results
-//                break;
-//
-//            default:
-//                System.out.println("Received: " + message.getType());
-//        }
-//    }
-//
-//    /**
-//     * Submit answer to server
-//     */
-//    public void submitAnswer(int answerIndex) {
-//        try {
-//            AnswerSubmission answer = new AnswerSubmission(username, answerIndex);
-//            Message message = new Message(Message.MessageType.SUBMIT_ANSWER, answer);
-//            out.writeObject(message);
-//            out.flush();
-//            System.out.println("Answer submitted: " + answerIndex);
-//        } catch (IOException e) {
-//            System.err.println("Failed to submit answer: " + e.getMessage());
-//        }
-//    }
-//
-//    /**
-//     * Disconnect from server
-//     */
-//    public void disconnect() {
-//        connected = false;
-//        try {
-//            if (out != null) {
-//                Message disconnectMsg = new Message(Message.MessageType.DISCONNECT, null);
-//                out.writeObject(disconnectMsg);
-//                out.flush();
-//            }
-//
-//            if (in != null) in.close();
-//            if (out != null) out.close();
-//            if (socket != null) socket.close();
-//
-//            System.out.println("Disconnected from server");
-//        } catch (IOException e) {
-//            System.err.println("Error during disconnect: " + e.getMessage());
-//        }
-//    }
-//
-//    public static void main(String[] args) {
-//        // Parse command line arguments
-//        // java clienteKahoot {IP PORT Sala Equipa Username}
-//
-//        if (args.length < 5) {
-//            System.err.println("Usage: java Client <IP> <PORT> <RoomCode> <TeamCode> <Username>");
-//            System.err.println("Example: java Client localhost 8080 1234 TEAM1 Alice");
-//            System.exit(1);
-//        }
-//
-//        String host = args[0];
-//        int port = Integer.parseInt(args[1]);
-//        String roomCode = args[2];
-//        String teamCode = args[3];
-//        String username = args[4];
-//
-//        Client client = new Client(host, port, roomCode, teamCode, username);
-//
-//        if (client.connect()) {
-//            System.out.println("Connected successfully! Waiting for game to start...");
-//
-//            // TODO: Launch GUI
-//            // For now, keep the client running
-//            try {
-//                Thread.sleep(Long.MAX_VALUE);
-//            } catch (InterruptedException e) {
-//                client.disconnect();
-//            }
-//        } else {
-//            System.err.println("Failed to connect to server");
-//            System.exit(1);
-//        }
-//    }
-//}
+public class Client {
+    private ObjectInputStream in;
+    private ObjectOutputStream out;
+    private Socket socket;
+    private SimpleClientGUI clientGUI;
+    private Player player;
 
+    public static void main(String[] args) {
+        String ip = args[0];
+        int port = Integer.parseInt(args[1]);
+        String game = args[2];
+        String team = args[3];
+        String client = args[4];
+        new Client().runClient(ip, port, game, team, client);
+    }
+
+    public void runClient(String ip, int port, String game, String team, String client) {
+        player = new Player(client, team, game);
+
+        try {
+            connectToServer(ip, port);
+            setStreams();
+            sendConnectionMessage();
+            waitMessages();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {// a fechar ...
+            closeCon();
+        }
+    }
+
+    private void sendConnectionMessage() {
+        ConnectionMessage connectionMessage = new ConnectionMessage(player);
+        try {
+            out.writeObject(connectionMessage);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    void connectToServer(String ip, int port) throws IOException {
+        InetAddress address = InetAddress.getByName(ip);
+        System.out.println(" Ligacao a : " + address + " : " + port);
+        socket = new Socket(address, port);
+        System.out.println("socket: " + socket);
+
+    }
+
+    void sendAnswer() throws IOException, ClassNotFoundException {
+        AnswerFromClient answerFromClient = new AnswerFromClient(clientGUI.getSelectedOption());
+        out.writeObject(answerFromClient);
+        System.out.println("Resposta enviada: " + answerFromClient.getSelectedOptionIndex());
+    }
+
+    private AnswerListener getAnswerListener() {
+        AnswerListener myAnswerListener = (answerMsg) -> {
+            try {
+                out.writeObject(answerMsg);
+                out.flush();
+                System.out.println("Resposta enviada para a pergunta: " + answerMsg.getQuestionText());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        };
+        return myAnswerListener;
+    }
+
+    private void waitMessages() {
+        AnswerListener myAnswerListener = getAnswerListener();
+
+        while (true) {
+            try {
+                Object obj = in.readObject();
+                System.out.println("Mensagem recebida pelo cliente: " + obj.getClass().getSimpleName());
+
+                if (obj instanceof QuestionMessage) {
+                    QuestionMessage questionMessage = (QuestionMessage) obj;
+
+                    if (clientGUI == null) {
+                        clientGUI = new SimpleClientGUI(questionMessage, player , myAnswerListener);
+                    } else {
+                        clientGUI.updateQuestion(questionMessage);
+                    }
+                }
+                else if (obj instanceof TimeMessage) {
+                    TimeMessage timeMessage = (TimeMessage) obj;
+
+                    int totalSeconds =  (timeMessage.getTimeToEndRound() / 1000);//30
+                    long timeNow = System.currentTimeMillis();
+                    long latencyMillis = timeNow - timeMessage.getCurrentTimeMillis();
+                    int latencySeconds = (int) (latencyMillis / 1000);
+
+                    int finalTime = totalSeconds - latencySeconds;
+                    System.out.println("Time left: " + finalTime);
+
+                    if (clientGUI != null) {
+                        clientGUI.startTimer(finalTime);
+                    }
+                }
+                else if (obj instanceof ScoreboardData) {
+                    ScoreboardData sbData = (ScoreboardData) obj;
+                    System.out.println("Scoreboard recebido: " + sbData);
+
+                    if (clientGUI != null) {
+                        clientGUI.updateScoreboard(sbData);
+                    }
+                }
+
+            } catch (EOFException e) {
+                break;
+            } catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace();
+                break;
+            }
+        }
+    }
+
+//    //TODO isto vai ser bloqueante???
+//    public void countdownInGUI(int seconds) {
+//        for (int i = seconds; i >= 0; i--) {
+//            System.out.println("Time left: " + i);
+//            clientGUI.updateTimerLabel(i);
+//            try {
+//                Thread.sleep(1000); // espera 1 segundo
+//            } catch (InterruptedException e) {
+//                Thread.currentThread().interrupt();
+//                return;
+//            }
+//        }
+//
+//        System.out.println("Time has run out!");
+//    }
+
+    private void setStreams() throws IOException {
+        in = new ObjectInputStream(socket.getInputStream());
+        out = new ObjectOutputStream(socket.getOutputStream());
+        out.flush();
+    }
+
+    private void closeCon() {
+        try {
+            if (socket != null)
+                socket.close();
+            if (in != null)
+                in.close();
+            if (out != null)
+                out.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+}

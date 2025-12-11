@@ -1,104 +1,82 @@
 {
-  "quizzes": {
-    "name": "PCD-2025",
-    "questions": [
-      {
-        "question": "O que é uma thread?",
-        "points": 5,
-        "correct": 3,
-        "type": "individual",
-        "options": [
-          "Processo",
-          "Aplicação",
-          "Programa",
-          "Processo Ligeiro"
-        ]
-      },
-      {
-        "question": "Qual destas opções não é um método bloqueante?",
-        "points": 3,
-        "correct": 2,
-        "type": "individual",
-        "options": [
-          "join()",
-          "sleep(<millis>)",
-          "interrupted()",
-          "wait()"
-        ]
-      },
-      {
-        "question": "O que é um deadlock?",
-        "points": 5,
-        "correct": 1,
-        "type": "team",
-        "options": [
-          "Situação onde threads ficam bloqueadas indefinidamente",
-          "Método para sincronizar threads",
-          "Tipo de exceção em Java",
-          "Algoritmo de escalonamento"
-        ]
-      },
-      {
-        "question": "Qual a diferença entre concorrência e paralelismo?",
-        "points": 4,
-        "correct": 0,
-        "type": "team",
-        "options": [
-          "Concorrência é sobre lidar com múltiplas tarefas, paralelismo é executá-las simultaneamente",
-          "São a mesma coisa",
-          "Paralelismo só funciona em sistemas distribuídos",
-          "Concorrência requer múltiplos processadores"
-        ]
-      },
-      {
-        "question": "O que é um semáforo?",
-        "points": 3,
-        "correct": 2,
-        "type": "individual",
-        "options": [
-          "Um tipo de thread",
-          "Um padrão de design",
-          "Mecanismo de sincronização que controla acesso a recursos",
-          "Uma estrutura de dados"
-        ]
-      },
-      {
-        "question": "O que é uma race condition?",
-        "points": 4,
-        "correct": 1,
-        "type": "individual",
-        "options": [
-          "Competição entre processos por CPU",
-          "Comportamento não determinístico devido a acesso concorrente",
-          "Método de otimização de threads",
-          "Tipo de algoritmo de ordenação"
-        ]
-      },
-      {
-        "question": "Para que serve o método synchronized em Java?",
-        "points": 3,
-        "correct": 0,
-        "type": "team",
-        "options": [
-          "Garantir exclusão mútua no acesso a recursos compartilhados",
-          "Aumentar a velocidade de execução",
-          "Criar novas threads",
-          "Terminar threads"
-        ]
-      },
-      {
-        "question": "O que é uma barreira (barrier) em programação concorrente?",
-        "points": 5,
-        "correct": 3,
-        "type": "team",
-        "options": [
-          "Um tipo de lock",
-          "Uma estrutura de dados thread-safe",
-          "Um padrão de comunicação",
-          "Ponto de sincronização onde threads esperam umas pelas outras"
-        ]
-      }
-    ]
-  }
+  "name": "PCD-1",
+  "questions": [
+    {
+      "question": "O que é uma thread?",
+      "correct": 3,
+      "points":5,
+      "options": [
+        "Processo",
+        "Aplicação",
+        "Programa",
+        "Processo Ligeiro"
+      ]
+    },
+    {
+      "question": "Qual destas opções não é um método bloqueante?",
+      "correct": 2,
+      "points":5,
+      "options": [
+        "join()",
+        "sleep(<millis>)",
+        "interrupted()",
+        "wait()"
+      ]
+    },
+    {
+      "question": "Qual é a vantagem de usar ThreadLocalRandom.current().nextInt() em vez de Random().nextInt()?",
+      "correct": 0,
+      "points":3,
+      "options": [
+        "Para garantir que outras threads não usem a mesma seed na geração de números aleatórios",
+        "Para outros programadores saberem quem chama aquela função é uma thread",
+        "Para o JVM saber que o programa que chama a função é uma thread",
+        "Nenhuma das anteriores"
+      ]
+    },
+    {
+      "question": "Qual é o número máximo de threads que podem existir num sistema operativo?",
+      "correct": 3,
+      "points":5,
+      "options": [
+        "Duas vezes o número de cores",
+        "Igual ao número de cores",
+        "16 mil threads",
+        "Não existe limite"
+      ]
+    },
+    {
+      "question": "Qual o nome do primeiro animal a ir ao espaço?",
+      "correct": 0,
+      "points":5,
+      "options": [
+        "Laika",
+        "Gagarin",
+        "Max",
+        "Macaco Tião"
+      ]
+    },
+    {
+      "question": "Como se chamava a esposa de William Shakespeare?",
+      "correct": 3,
+      "points":5,
+      "options": [
+        "Sandra Bullock",
+        "Kate Winslet",
+        "Parker Posey",
+        "Anne Hathaway"
+      ]
+    },
+    {
+      "question": "Qual o político português que liderou o maior número de governos depois do 25 de Abril?",
+      "correct": 1,
+      "points":5,
+      "options": [
+        "Cavaco Silva",
+        "Vasco Gonçalves",
+        "Mário Soares",
+        "Francisco Balsemão"
+      ]
+    }
+  ]
 }
-

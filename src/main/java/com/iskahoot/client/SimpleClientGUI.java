@@ -211,10 +211,10 @@ public class SimpleClientGUI extends JFrame {
             }
         }
         if (questionMessage != null && listener != null) {
-            // 1. O Cliente PREENCHE o campo vazio
+            // O Cliente PREENCHE o campo vazio
             questionMessage.setSelectedAnswerIndex(index);
             questionMessage.setClientCode(player.getPlayerCode());
-            // 2. Envia o objeto modificado de volta via Callback
+            // Envia o objeto modificado de volta via Callback
             listener.onAnswerSelected(questionMessage);
         }
         System.out.println("Selected: " + index);

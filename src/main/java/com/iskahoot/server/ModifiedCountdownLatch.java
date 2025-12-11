@@ -24,6 +24,7 @@ public class ModifiedCountdownLatch {
      * Invocado quando o jogador envia a resposta.
      * Retorna o multiplicador de pontuação (ex: 2 para os primeiros, 1 para os restantes).
      */
+
     public synchronized int countdown() {
         if (finished) {
             return 0;

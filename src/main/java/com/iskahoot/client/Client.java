@@ -63,8 +63,8 @@ public class Client {
         System.out.println("Resposta enviada: " + answerFromClient.getSelectedOptionIndex());
     }
 
-    private void waitMessages() {
-       AnswerListener myAnswerListener = (answerMsg) -> {
+    private AnswerListener getAnswerListener() {
+        AnswerListener myAnswerListener = (answerMsg) -> {
             try {
                 out.writeObject(answerMsg);
                 out.flush();
@@ -73,6 +73,11 @@ public class Client {
                 e.printStackTrace();
             }
         };
+        return myAnswerListener;
+    }
+
+    private void waitMessages() {
+        AnswerListener myAnswerListener = getAnswerListener();
 
         while (true) {
             try {

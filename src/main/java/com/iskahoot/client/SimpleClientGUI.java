@@ -162,64 +162,38 @@ public class SimpleClientGUI extends JFrame {
         System.out.println("GUI atualizada com nova pergunta.");
     }
 
-//    private void displayQuestion(Question q) {
-//
-    ////        waitingForAnswer = true;
-//        selectedOption = -1;
-//
-//        questionLabel.setText(q.getQuestion());
-//
-//        for (int i = 0; i < 4; i++) {
-//            optionButtons[i].setText(q.getOptions().get(i));
-//            optionButtons[i].setEnabled(true);
-//        }
-//        //        startTimer(30);
-//        //   updateTimerLabel(30);
+//    //Timer update method //TODO  posso usar invoke later?
+//    public static void updateTimerLabel(long timeLeft) {
+//        SwingUtilities.invokeLater(() -> {
+//            timerLabel.setText("Timer: " + timeLeft);
+//        });
 //    }
-
-    //Timer update method
-    public static void updateTimerLabel(long timeLeft) {
-//        if (timeLeft < 0) timeLeft = 0;
-//        timerLabel.setText("Timer: " + timeLeft);
-        SwingUtilities.invokeLater(() -> {
-            timerLabel.setText("Timer: " + timeLeft);
-        });
-    }
 
     public void startTimer(int totalSeconds) {
 
-        // 2. Criar uma nova thread para NÃO bloquear a janela
+        // 2. Criar uma nova thread para não bloquear
         countdownThread = new Thread(() -> {
             int timeLeft = totalSeconds;
-
             try {
                 while (timeLeft >= 0) {
-
                     timerLabel.setText("Timer: " + timeLeft);
-
                     if (timeLeft <= 5) {
                         timerLabel.setForeground(Color.RED);
                     } else {
                         timerLabel.setForeground(Color.BLACK);
                     }
-
                     Thread.sleep(1000);
-
                     timeLeft--;
                 }
                 timerLabel.setText("Tempo Acabou");
-
-
             } catch (InterruptedException e) {
             }
         });
-
-        // 3. Iniciar a contagem
         countdownThread.start();
     }
 
     public void stopTimer() {
-        // Se a thread existe e está viva, interrompe o sono dela
+        //Se a thread existe e está viva, interrompe
         if (countdownThread != null && countdownThread.isAlive()) {
             countdownThread.interrupt();
         }
@@ -229,10 +203,6 @@ public class SimpleClientGUI extends JFrame {
         stopTimer();
 
         selectedOption = index;
-//        waitingForAnswer = false;
-//        stopTimer();
-        //TODO enviar resposta para o servidor
-//        sendAnswer();
 
         for (int i = 0; i < 4; i++) {
             optionButtons[i].setEnabled(false);
@@ -249,23 +219,6 @@ public class SimpleClientGUI extends JFrame {
         }
         System.out.println("Selected: " + index);
     }
-
-
-//    private void nextQuestion() {
-//
-//        currentQuestion++;
-//
-//        if (currentQuestion >= questions.size()) {
-//            showGameEnded();
-//            return;
-//        }
-//
-//        // Reset button color
-//        for (JButton b : optionButtons)
-//            b.setBackground(null);
-//
-//        displayQuestion(questions.get(currentQuestion));
-//    }
 
     private void showGameEnded() {
 

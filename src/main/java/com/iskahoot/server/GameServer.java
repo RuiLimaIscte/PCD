@@ -25,6 +25,7 @@ public class GameServer {
         System.out.println("Server started on port " + port);
 
         // Thread para criar jogos via consola
+        //TODO POR NUEMRO DE PERGUNTAS MAXIMO
         new Thread(this::handleConsoleCommands).start();
 
         ServerSocket serverSocket = new ServerSocket(port);
@@ -91,14 +92,14 @@ public class GameServer {
                         boolean accepted = gameState.registerPlayer(msg.getTeamCode(), msg.getClientCode(), this);
 
                         if (accepted) {
-                            System.out.println("Client conectado ao jogo " + msg.getGameCode());
+                            System.out.println("Client conectado ao jogo  " + msg.getGameCode());
                             listenForAnswers();
                         } else {
-                            System.out.println("Jogo cheio.");
+                            System.out.println("Jogo cheio");
                             closeConnection();
                         }
                     } else {
-                        System.out.println("Jogo não existe.");
+                        System.out.println("Jogo nao existe");
                         closeConnection();
                     }
                 }
@@ -131,7 +132,7 @@ public class GameServer {
         public void sendQuestion(Question q) throws IOException {
             out.writeObject(new QuestionMessage(q.getQuestion(),q.getType(), q.getOptions()));
             out.flush();
-            System.out.println("Enviado pergunta ao cliente.");
+            System.out.println("Enviada pergunta ao cliente.");
         }
 
         public void sendScoreboard(ScoreboardData data) throws IOException {
@@ -147,7 +148,16 @@ public class GameServer {
         }
 
         private void closeConnection() {
-            try { socket.close(); } catch (IOException e) {}
+            try {
+                if (socket != null)
+                    socket.close();
+                if (in != null)
+                    in.close();
+                if (out != null)
+                    out.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

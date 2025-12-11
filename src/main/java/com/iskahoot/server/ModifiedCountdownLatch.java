@@ -39,7 +39,6 @@ public class ModifiedCountdownLatch {
         if (remaining <= 0) {
             finish();
         }
-
         return multiplier;
     }
 

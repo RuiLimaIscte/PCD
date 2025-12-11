@@ -17,7 +17,7 @@ public class TimeMessage implements Serializable {
         return currentTimeMillis;
     }
 
-    public long getTimeToEndRound() {
+    public int getTimeToEndRound() {
         return timeToEndRound;
     }
 

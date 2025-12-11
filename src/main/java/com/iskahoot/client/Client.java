@@ -8,7 +8,7 @@ import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
 
-public class ClientObjects {
+public class Client {
     private ObjectInputStream in;
     private ObjectOutputStream out;
     private Socket socket;
@@ -21,7 +21,7 @@ public class ClientObjects {
         String game = args[2];
         String team = args[3];
         String client = args[4];
-        new ClientObjects().runClient(ip, port, game, team, client);
+        new Client().runClient(ip, port, game, team, client);
     }
 
     public void runClient(String ip, int port, String game, String team, String client) {
@@ -83,17 +83,15 @@ public class ClientObjects {
                     QuestionMessage questionMessage = (QuestionMessage) obj;
 
                     if (clientGUI == null) {
-                        System.out.println("Criando nova GUI...");
                         clientGUI = new SimpleClientGUI(questionMessage, player , myAnswerListener);
                     } else {
-                        System.out.println("Atualizando GUI existente...");
                         clientGUI.updateQuestion(questionMessage);
                     }
                 }
                 else if (obj instanceof TimeMessage) {
                     TimeMessage timeMessage = (TimeMessage) obj;
 
-                    int totalSeconds = (int) (timeMessage.getTimeToEndRound() / 1000);//30
+                    int totalSeconds =  (timeMessage.getTimeToEndRound() / 1000);//30
                     long timeNow = System.currentTimeMillis();
                     long latencyMillis = timeNow - timeMessage.getCurrentTimeMillis();
                     int latencySeconds = (int) (latencyMillis / 1000);
@@ -114,9 +112,7 @@ public class ClientObjects {
                     }
                 }
 
-
             } catch (EOFException e) {
-                System.out.println("Connection closed by server.");
                 break;
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
@@ -125,27 +121,26 @@ public class ClientObjects {
         }
     }
 
-    //TODO isto vai ser bloqueante???
-    public void countdownInGUI(int seconds) {
-        for (int i = seconds; i >= 0; i--) {
-            System.out.println("Time left: " + i);
-            clientGUI.updateTimerLabel(i);
-            try {
-                Thread.sleep(1000); // espera 1 segundo
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                return;
-            }
-        }
-
-        System.out.println("Time has run out!");
-    }
+//    //TODO isto vai ser bloqueante???
+//    public void countdownInGUI(int seconds) {
+//        for (int i = seconds; i >= 0; i--) {
+//            System.out.println("Time left: " + i);
+//            clientGUI.updateTimerLabel(i);
+//            try {
+//                Thread.sleep(1000); // espera 1 segundo
+//            } catch (InterruptedException e) {
+//                Thread.currentThread().interrupt();
+//                return;
+//            }
+//        }
+//
+//        System.out.println("Time has run out!");
+//    }
 
     private void setStreams() throws IOException {
         in = new ObjectInputStream(socket.getInputStream());
         out = new ObjectOutputStream(socket.getOutputStream());
         out.flush();
-
     }
 
     private void closeCon() {

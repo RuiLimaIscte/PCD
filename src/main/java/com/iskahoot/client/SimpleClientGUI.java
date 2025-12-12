@@ -32,7 +32,7 @@ public class SimpleClientGUI extends JFrame {
 
     private int selectedOption = -1;
     // private boolean waitingForAnswer = false;
-
+    private ScoreboardData lastScoreboard;
 
     private Player player;
 
@@ -116,6 +116,7 @@ public class SimpleClientGUI extends JFrame {
     }
 
     public void updateScoreboard(ScoreboardData data) {
+        this.lastScoreboard = data;
         SwingUtilities.invokeLater(() -> {
             StringBuilder sb = new StringBuilder();
 
@@ -142,6 +143,9 @@ public class SimpleClientGUI extends JFrame {
 
             scoreboardArea.setText(sb.toString());
         });
+        if (data.getCurrentRound() == data.getTotalRounds()) {
+            SwingUtilities.invokeLater(this::showGameEnded);
+        }
     }
 
     public void updateQuestion(QuestionMessage newQuestionMessage) {
@@ -221,20 +225,48 @@ public class SimpleClientGUI extends JFrame {
     }
 
     private void showGameEnded() {
+        stopTimer();
 
-//        stopTimer();
+        SwingUtilities.invokeLater(() -> {
+            // Mudar o título da janela
+            setTitle("Kahoot - Resultados Finais");
 
-        questionLabel.setText("GAME OVER");
-        for (JButton b : optionButtons) {
-            b.setEnabled(false);
-            b.setVisible(false);
-        }
+            // Limpar todos os componentes da janela
+            getContentPane().removeAll();
+            getContentPane().setLayout(new BorderLayout());
 
-        timerLabel.setText("Timer: --");
+            // Título
+            JLabel titleLabel = new JLabel("Resultados Finais", SwingConstants.CENTER);
+            titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
+            getContentPane().add(titleLabel, BorderLayout.NORTH);
 
-        JOptionPane.showMessageDialog(this, "O jogo terminou!");
+            // Garantir que a scoreboardArea existe e está só de leitura
+            if (scoreboardArea == null) {
+                scoreboardArea = new JTextArea();
+            }
+            scoreboardArea.setEditable(false);
+            scoreboardArea.setFont(new Font("Monospaced", Font.PLAIN, 14));
 
-        dispose();
+            // Se quiseres, aqui podes reconstruir o texto final com lastScoreboard
+            // (por agora, usamos o que já lá estiver)
+            if (lastScoreboard == null && scoreboardArea.getText().isEmpty()) {
+                scoreboardArea.setText("Jogo terminado. Sem dados de scoreboard.");
+            }
 
+            JScrollPane scrollPane = new JScrollPane(scoreboardArea);
+            getContentPane().add(scrollPane, BorderLayout.CENTER);
+
+            // Botão de fechar
+            JButton closeButton = new JButton("Fechar");
+            closeButton.addActionListener(e -> dispose());
+
+            JPanel bottomPanel = new JPanel();
+            bottomPanel.add(closeButton);
+            getContentPane().add(bottomPanel, BorderLayout.SOUTH);
+
+            // Atualizar UI
+            revalidate();
+            repaint();
+        });
     }
 }

@@ -33,16 +33,16 @@ public class ModifiedCountdownLatch {
         // Se todos responderam, podemos marcar como terminado (opcional para a lógica de bónus, mas útil para fluxo)
         if (remaining <= 0) {
             finish();
-            notifyAll();
+//            notifyAll();
         }
 
         return multiplier;
     }
 
-    // Isto é opcional, mas pode ser útil para fluxo de controlo, no entanto para já fica comentado
+    // logica de wait(roundtime) no gamestate
 //    public synchronized void await() throws InterruptedException {
 //        while (!finished && remaining > 0) {
-//            wait();
+//            wait(roundtime);
 //        }
 //    }
 

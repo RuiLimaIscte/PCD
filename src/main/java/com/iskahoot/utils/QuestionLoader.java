@@ -22,10 +22,10 @@ public class QuestionLoader {
                 jsonReader = readDataFromFile(filePath);
                 Quiz quiz = gson.fromJson(jsonReader, Quiz.class);
                 for(Question question : quiz.getQuestions()){
-                    if(Math.random() < 0.5) question.setType("individual");
-                    else question.setType("team");
-//                    question.setType("team");
-//                    System.out.println(question.getType());
+//                    if(Math.random() < 0.5) question.setType("individual");
+//                    else question.setType("team");
+                    question.setType("individual");
+                    System.out.println(question.getType());
                 }
                 return quiz;
 

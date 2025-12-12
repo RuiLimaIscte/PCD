@@ -36,10 +36,14 @@ public class Game {
     public synchronized void addPlayer(String teamCode, String playerCode) {
         Team team = getTeam(teamCode);
 
+
         // Se não existe, cria e adiciona à lista
         if (team == null) {
             team = new Team(teamCode);
             teams.add(team);
+        } else {
+
+
         }
 
         // Adiciona o jogador (Team.java já tem lógica para não exceder MAX_PLAYERS)

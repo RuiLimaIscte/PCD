@@ -10,12 +10,13 @@ public class Team implements Serializable {
     private String teamCode;
     private List<Player> players;
     private int teamScore;
-    private static final int MAX_PLAYERS = 2;
+    private int maxPlayers;
 
-    public Team(String teamCode) {
+    public Team(String teamCode,int maxPlayers) {
         this.teamCode = teamCode;
         this.players = new ArrayList<>();
         this.teamScore = 0;
+        this.maxPlayers = maxPlayers;
     }
 
     public String getTeamCode() {
@@ -23,7 +24,7 @@ public class Team implements Serializable {
     }
 
     public List<Player> getPlayers() {
-        return new ArrayList<>(players);  // Return copy for thread safety
+        return new ArrayList<>(players);
     }
 
     public int getTeamScore() {
@@ -35,7 +36,7 @@ public class Team implements Serializable {
     }
 
     public boolean addPlayer(Player player) {
-        if (players.size() >= MAX_PLAYERS) {
+        if (players.size() >= maxPlayers) {
             return false;
         }
         players.add(player);
@@ -43,7 +44,7 @@ public class Team implements Serializable {
     }
 
     public boolean isFull() {
-        return players.size() >= MAX_PLAYERS;
+        return players.size() >= maxPlayers;
     }
 
     public int getPlayerCount() {

@@ -31,15 +31,19 @@ public class GameState extends Thread {
         return game;
     }
 
-    // Método chamado pelo Server quando alguém se conecta
+    // regista um jogador na sala
     public synchronized boolean registerPlayer(String teamCode, String clientCode, GameServer.DealWithClient clientThread) {
         if (game.isGameFull()) return false;
 
-        game.addPlayer(teamCode, clientCode);
+        boolean added = game.addPlayer(teamCode, clientCode);
+        if (!added) {
+            System.out.println("Jogador " + clientCode + " rejeitado, equipa cheio");
+            return false;
+        }
 
         connectedClients.add(clientThread);
 
-        System.out.println("Jogador adicionado. Total: " + connectedClients.size());
+        System.out.println("Jogador adicionado, total: " + connectedClients.size());
 
         //Se esta cheio, acorda a thread deste jogo
         if (game.isGameFull()) {
@@ -64,7 +68,7 @@ public class GameState extends Thread {
         }
 
         System.out.println("Sala cheia. Iniciar o jogo " + game.getGameCode());
-        game.setStatus(Game.STATUS.PLAYING);
+//        game.setStatus(Game.STATUS.PLAYING);
 
         try {
             for (Question q : game.getQuiz().getQuestions()) {
@@ -74,7 +78,6 @@ public class GameState extends Thread {
 
                 currentQuestionIndex++;
                 System.out.println("Pergunta " + currentQuestionIndex);
-                //TODO se for a ultima pergunta fazer diferente
 
                 // Limpar respostas da ronda anterior
                 synchronized (this) {
@@ -83,7 +86,6 @@ public class GameState extends Thread {
                     prepareRoundSyncTools(q);
                 }
 
-                //TODO enviar tenmpo na pergunta????
                 broadcastQuestion(q);
 
                 synchronized (this) {
@@ -95,6 +97,7 @@ public class GameState extends Thread {
                     wait(ROUNDTIME);
                 }
 
+                //Se é do tipo team e existe barreiras mas a ronda acabou, forçar o fim das barreiras
                 if (q.isTeam() && teamBarriers != null) {
                     teamBarriers.values().forEach(TeamBarrier::forceFinish);
                 }
@@ -111,12 +114,12 @@ public class GameState extends Thread {
         }
 
         System.out.println("Jogo Terminado.");
-        game.setStatus(Game.STATUS.FINISHED);
+//        game.setStatus(Game.STATUS.FINISHED);
     }
 
     private void prepareRoundSyncTools(Question q) {
         if (q.isIndividual()) {
-            // Bónus x2, para os primeiros 2
+            // Bonus vezes 2, para os primeiros 2 jogadores se acertarem ambos
             int totalPlayers = game.getConnectedPlayersCount();
             individualLatch = new ModifiedCountdownLatch(2, 2, totalPlayers);
             teamBarriers = null;

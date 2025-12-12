@@ -159,7 +159,7 @@ public class SimpleClientGUI extends JFrame {
         //Update title with question type
         setTitle("Kahoot Client - " + player.getPlayerCode() + " " + player.getTeamCode() + " " + player.getGameCode() + " " + questionMessage.getQuestionType() );
 
-        System.out.println("GUI atualizada com nova pergunta.");
+        System.out.println("GUI atualizada com nova pergunta");
     }
 
 //    //Timer update method //TODO  posso usar invoke later?
@@ -171,7 +171,7 @@ public class SimpleClientGUI extends JFrame {
 
     public void startTimer(int totalSeconds) {
 
-        // 2. Criar uma nova thread para não bloquear
+        //nova thread para não bloquear
         countdownThread = new Thread(() -> {
             int timeLeft = totalSeconds;
             try {
@@ -193,7 +193,7 @@ public class SimpleClientGUI extends JFrame {
     }
 
     public void stopTimer() {
-        //Se a thread existe e está viva, interrompe
+        //Se a thread existe e não está viva, interrompe
         if (countdownThread != null && countdownThread.isAlive()) {
             countdownThread.interrupt();
         }

@@ -118,7 +118,7 @@ public class GameState extends Thread {
         if (q.isIndividual()) {
             // Bónus x2, para os primeiros 2
             int totalPlayers = game.getConnectedPlayersCount();
-            individualLatch = new ModifiedCountdownLatch(2, 2, ROUNDTIME, totalPlayers);
+            individualLatch = new ModifiedCountdownLatch(2, 2, totalPlayers);
             teamBarriers = null;
         } else {
             // Team: Criar uma barreira por equipa

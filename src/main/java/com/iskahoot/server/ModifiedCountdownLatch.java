@@ -12,7 +12,7 @@ public class ModifiedCountdownLatch {
     private boolean finished = false;
 
 
-    public ModifiedCountdownLatch(int bonusFactor, int bonusCount, int waitPeriodMillis, int totalCount) {
+    public ModifiedCountdownLatch(int bonusFactor, int bonusCount, int totalCount) {
         this.bonusFactor = bonusFactor;
         this.bonusCount = bonusCount;
         this.remaining = totalCount;

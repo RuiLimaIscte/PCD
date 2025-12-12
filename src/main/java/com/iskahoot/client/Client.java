@@ -92,13 +92,10 @@ public class Client {
                     } else {
                         clientGUI.updateQuestion(questionMessage);
                     }
-                }
-                else if (obj instanceof TimeMessage) {
-                    TimeMessage timeMessage = (TimeMessage) obj;
 
-                    int totalSeconds =  (timeMessage.getTimeToEndRound() / 1000);//30
+                    int totalSeconds =  (questionMessage.getTimeToEndRound() / 1000);//30
                     long timeNow = System.currentTimeMillis();
-                    long latencyMillis = timeNow - timeMessage.getCurrentTimeMillis();
+                    long latencyMillis = timeNow - questionMessage.getCurrentTimeMillis();
                     int latencySeconds = (int) (latencyMillis / 1000);
 
                     int finalTime = totalSeconds - latencySeconds;

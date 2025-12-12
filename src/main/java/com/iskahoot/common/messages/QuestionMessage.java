@@ -12,15 +12,18 @@ public class QuestionMessage implements Serializable {
     private String questionText;
     private String questionType;
     private List<String> options;
-
+    private long currentTimeMillis;
+    private int timeToEndRound;
 
     private Integer selectedAnswerIndex = null;
 
-    public QuestionMessage(String questionText, String questionType, List<String> options) {
+    public QuestionMessage(String questionText, String questionType, List<String> options, long currentTimeMillis, int timeToEndRound) {
         this.questionText = questionText;
         this.questionType = questionType;
         System.out.println(questionType);
         this.options = options;
+        this.currentTimeMillis = currentTimeMillis;
+        this.timeToEndRound = timeToEndRound;
     }
 
     public String getQuestionText() {
@@ -49,5 +52,13 @@ public class QuestionMessage implements Serializable {
 
     public String getClientCode() {
         return clientCode;
+    }
+
+    public long getCurrentTimeMillis() {
+        return currentTimeMillis;
+    }
+
+    public int getTimeToEndRound() {
+        return timeToEndRound;
     }
 }

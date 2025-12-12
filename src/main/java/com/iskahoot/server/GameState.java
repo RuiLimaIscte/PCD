@@ -87,7 +87,7 @@ public class GameState extends Thread {
                 broadcastQuestion(q);
 
                 synchronized (this) {
-                    broadcastTime(System.currentTimeMillis(), ROUNDTIME);
+                    //broadcastTime(System.currentTimeMillis(), ROUNDTIME);
                     // Se alguém fizer notifyAll(), ele acorda antes dos 30s
                     // Se ninguém fizer nada, ele acorda sozinho passados 30s
                     //TODO passar para o latch/barrier???
@@ -269,20 +269,20 @@ public class GameState extends Thread {
         System.out.println("Enviada pergunta: " + q.getQuestion());
         for (GameServer.DealWithClient client : connectedClients) {
             try {
-                client.sendQuestion(q);
+                client.sendQuestion(q, System.currentTimeMillis(), ROUNDTIME);
             } catch (IOException e) {
             }
         }
     }
-    private synchronized void broadcastTime(long timestamp, int roundTime) {
-        System.out.println("Enviado time: " + timestamp);
-        for (GameServer.DealWithClient client : connectedClients) {
-            try {
-                client.sendTime(timestamp, roundTime);
-            } catch (IOException e) {
-            } catch (ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
+//    private synchronized void broadcastTime(long timestamp, int roundTime) {
+//        System.out.println("Enviado time: " + timestamp);
+//        for (GameServer.DealWithClient client : connectedClients) {
+//            try {
+//                client.sendTime(timestamp, roundTime);
+//            } catch (IOException e) {
+//            } catch (ClassNotFoundException e) {
+//                throw new RuntimeException(e);
+//            }
+//        }
+//    }
 }

@@ -129,8 +129,8 @@ public class GameServer {
             }
         }
 
-        public void sendQuestion(Question q) throws IOException {
-            out.writeObject(new QuestionMessage(q.getQuestion(),q.getType(), q.getOptions()));
+        public void sendQuestion(Question q, long currentTimeMillis, int timeToEndRound) throws IOException {
+            out.writeObject(new QuestionMessage(q.getQuestion(),q.getType(), q.getOptions(), currentTimeMillis, timeToEndRound));
             out.flush();
             System.out.println("Enviada pergunta ao cliente.");
         }

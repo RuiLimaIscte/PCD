@@ -213,12 +213,11 @@ public class SimpleClientGUI extends JFrame {
         //Update title with question type
         setTitle("Kahoot Client - " + player.getPlayerCode() + " " + player.getTeamCode() + " " + player.getGameCode() + " " + questionMessage.getQuestionType() );
 
-        System.out.println("GUI atualizada com nova pergunta.");
+        System.out.println("GUI atualizada com nova pergunta");
     }
 
     public void startTimer(int totalSeconds) {
-
-        // Criar uma nova thread para não bloquear
+        //nova thread para não bloquear
         countdownThread = new Thread(() -> {
             int timeLeft = totalSeconds;
             try {

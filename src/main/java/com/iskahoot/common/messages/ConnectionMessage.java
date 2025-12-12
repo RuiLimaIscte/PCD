@@ -11,6 +11,7 @@ public class ConnectionMessage implements Serializable {
     private String teamCode;
     private String clientCode;
 
+
     public ConnectionMessage(Player player) {
         this.gameCode = player.getGameCode();
         this.teamCode = player.getTeamCode();

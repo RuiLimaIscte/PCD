@@ -89,7 +89,7 @@ public class GameState extends Thread {
                 broadcastQuestion(q);
 
                 synchronized (this) {
-                    broadcastTime(System.currentTimeMillis(), ROUNDTIME);
+                    //broadcastTime(System.currentTimeMillis(), ROUNDTIME);
                     // Se alguém fizer notifyAll(), ele acorda antes dos 30s
                     // Se ninguém fizer nada, ele acorda sozinho passados 30s
                     //TODO passar para o latch/barrier???
@@ -121,7 +121,7 @@ public class GameState extends Thread {
         if (q.isIndividual()) {
             // Bonus vezes 2, para os primeiros 2 jogadores se acertarem ambos
             int totalPlayers = game.getConnectedPlayersCount();
-            individualLatch = new ModifiedCountdownLatch(2, 2, ROUNDTIME, totalPlayers);
+            individualLatch = new ModifiedCountdownLatch(2, 2, totalPlayers);
             teamBarriers = null;
         } else {
             // Team: Criar uma barreira por equipa
@@ -175,8 +175,8 @@ public class GameState extends Thread {
 
         //int correctAnswerIndex = game.getQuiz().getQuestion(currentQuestionIndex).getCorrect();
         //Atualiza o objeto player com a pontuação
-//        Player player = findPlayer(clientCode);
-//        calculateScore(player, answerIndex, correctAnswerIndex);
+        //Player player = findPlayer(clientCode);
+        //calculateScore(player, answerIndex, correctAnswerIndex);
         Player player = findPlayer(clientCode);
         if (player == null) {
             System.out.println("Player errado");
@@ -272,20 +272,20 @@ public class GameState extends Thread {
         System.out.println("Enviada pergunta: " + q.getQuestion());
         for (GameServer.DealWithClient client : connectedClients) {
             try {
-                client.sendQuestion(q);
+                client.sendQuestion(q, System.currentTimeMillis(), ROUNDTIME);
             } catch (IOException e) {
             }
         }
     }
-    private synchronized void broadcastTime(long timestamp, int roundTime) {
-        System.out.println("Enviado time: " + timestamp);
-        for (GameServer.DealWithClient client : connectedClients) {
-            try {
-                client.sendTime(timestamp, roundTime);
-            } catch (IOException e) {
-            } catch (ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
+//    private synchronized void broadcastTime(long timestamp, int roundTime) {
+//        System.out.println("Enviado time: " + timestamp);
+//        for (GameServer.DealWithClient client : connectedClients) {
+//            try {
+//                client.sendTime(timestamp, roundTime);
+//            } catch (IOException e) {
+//            } catch (ClassNotFoundException e) {
+//                throw new RuntimeException(e);
+//            }
+//        }
+//    }
 }

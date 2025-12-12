@@ -95,7 +95,7 @@ public class GameServer {
                             System.out.println("Client conectado ao jogo  " + msg.getGameCode());
                             listenForAnswers();
                         } else {
-                            System.out.println("Jogo cheio");
+                            //jogo cheio
                             closeConnection();
                         }
                     } else {

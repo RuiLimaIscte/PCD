@@ -23,44 +23,48 @@ public class Game {
     private final int numberOfTeams;
     private final int playersPerTeam;
     private List<Team> teams = new ArrayList<>();
-    private STATUS status;
+//    private STATUS status;
 
     public Game(String gameCode, int numberOfTeams, int playersPerTeam) {
         this.gameCode = gameCode;
         this.numberOfTeams = numberOfTeams;
         this.playersPerTeam = playersPerTeam;
         this.quiz = loadFromFile("src/main/resources/questions.json");
-        this.status = STATUS.WAITING;
+//        this.status = STATUS.WAITING;
     }
 
-    public synchronized void addPlayer(String teamCode, String playerCode) {
+    public synchronized boolean addPlayer(String teamCode, String playerCode) {
         Team team = getTeam(teamCode);
 
-
-        // Se não existe, cria e adiciona à lista
+        // Se nao existe, cria e adiciona à lista
         if (team == null) {
-            team = new Team(teamCode);
+            if(teams.size() >= numberOfTeams) {
+                System.out.println("Número máximo de equipas");
+                return false;
+            }
+            team = new Team(teamCode, playersPerTeam);
             teams.add(team);
-        } else {
-
-
         }
 
-        // Adiciona o jogador (Team.java já tem lógica para não exceder MAX_PLAYERS)
+        //equipa cheia
+        if (team.isFull()) {
+            return false;
+        }
+
+        // Adiciona o jogador
         Player newPlayer = new Player(playerCode, teamCode, gameCode);
         boolean added = team.addPlayer(newPlayer);
 
         if (added) {
             System.out.println("Adicionado " + playerCode + " à equipa " + teamCode);
-        } else {
-            System.out.println("Equipa cheia! Não foi possível adicionar " + playerCode);
+            // Check if room is ready to start
+//            if (isGameFull()) {
+////                status = STATUS.READY;
+//                System.out.println("Room " + gameCode + " ready");
+//            }
+            return true;
         }
-
-        // Check if room is ready to start
-        if (isGameFull()) {
-            status = STATUS.READY;
-            System.out.println("Room " + gameCode + " is ready to start!");
-        }
+        return false;
     }
 
     public Team getTeam(String teamCode) {
@@ -74,18 +78,18 @@ public class Game {
         return null;
     }
 
-    public synchronized boolean canStartGame() {
-        if (status != STATUS.READY) {
-            System.out.println("Room is not ready to start, waiting for players to join...");
-            return false;
-        }
-
-        status = STATUS.PLAYING;
-
-        System.out.println("Game starting in room: " + gameCode);
-
-        return true;
-    }
+//    public synchronized boolean canStartGame() {
+//        if (status != STATUS.READY) {
+//            System.out.println("Room is not ready to start, waiting for players to join...");
+//            return false;
+//        }
+//
+//        status = STATUS.PLAYING;
+//
+//        System.out.println("Game starting in room: " + gameCode);
+//
+//        return true;
+//    }
 
     public boolean isGameFull() {
         return getConnectedPlayersCount() >= getExpectedPlayers();
@@ -117,14 +121,14 @@ public class Game {
             return teams.stream().mapToInt(Team::getPlayerCount).sum(); //
         }
     }
+//
+//    public STATUS getStatus() {
+//        return status;
+//    }
 
-    public STATUS getStatus() {
-        return status;
-    }
-
-    public void setStatus(STATUS status) {
-        this.status = status;
-    }
+//    public void setStatus(STATUS status) {
+//        this.status = status;
+//    }
 
     public Quiz getQuiz() {
         return quiz;

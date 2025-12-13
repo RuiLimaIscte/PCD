@@ -51,16 +51,10 @@ public class Client {
 
     void connectToServer(String ip, int port) throws IOException {
         InetAddress address = InetAddress.getByName(ip);
-        System.out.println(" Ligacao a : " + address + " : " + port);
+        System.out.println("Ligacao a : " + address + " : " + port);
         socket = new Socket(address, port);
         System.out.println("socket: " + socket);
 
-    }
-
-    void sendAnswer() throws IOException, ClassNotFoundException {
-        AnswerFromClient answerFromClient = new AnswerFromClient(clientGUI.getSelectedOption());
-        out.writeObject(answerFromClient);
-        System.out.println("Resposta enviada: " + answerFromClient.getSelectedOptionIndex());
     }
 
     private AnswerListener getAnswerListener() {
@@ -82,7 +76,6 @@ public class Client {
         while (true) {
             try {
                 Object obj = in.readObject();
-                System.out.println("Mensagem recebida pelo cliente: " + obj.getClass().getSimpleName());
 
                 if (obj instanceof QuestionMessage) {
                     QuestionMessage questionMessage = (QuestionMessage) obj;
@@ -99,7 +92,6 @@ public class Client {
                     int latencySeconds = (int) (latencyMillis / 1000);
 
                     int finalTime = totalSeconds - latencySeconds;
-                    System.out.println("Time left: " + finalTime);
 
                     if (clientGUI != null) {
                         clientGUI.startTimer(finalTime);
@@ -107,7 +99,6 @@ public class Client {
                 }
                 else if (obj instanceof ScoreboardData) {
                     ScoreboardData sbData = (ScoreboardData) obj;
-                    System.out.println("Scoreboard recebido: " + sbData);
 
                     if (clientGUI != null) {
                         clientGUI.updateScoreboard(sbData);
@@ -122,22 +113,6 @@ public class Client {
             }
         }
     }
-
-//    //TODO isto vai ser bloqueante???
-//    public void countdownInGUI(int seconds) {
-//        for (int i = seconds; i >= 0; i--) {
-//            System.out.println("Time left: " + i);
-//            clientGUI.updateTimerLabel(i);
-//            try {
-//                Thread.sleep(1000); // espera 1 segundo
-//            } catch (InterruptedException e) {
-//                Thread.currentThread().interrupt();
-//                return;
-//            }
-//        }
-//
-//        System.out.println("Time has run out!");
-//    }
 
     private void setStreams() throws IOException {
         in = new ObjectInputStream(socket.getInputStream());
@@ -157,6 +132,4 @@ public class Client {
             e.printStackTrace();
         }
     }
-
-
 }

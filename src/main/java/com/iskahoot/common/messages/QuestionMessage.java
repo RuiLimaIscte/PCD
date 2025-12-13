@@ -20,7 +20,6 @@ public class QuestionMessage implements Serializable {
     public QuestionMessage(String questionText, String questionType, List<String> options, long currentTimeMillis, int timeToEndRound) {
         this.questionText = questionText;
         this.questionType = questionType;
-        System.out.println(questionType);
         this.options = options;
         this.currentTimeMillis = currentTimeMillis;
         this.timeToEndRound = timeToEndRound;

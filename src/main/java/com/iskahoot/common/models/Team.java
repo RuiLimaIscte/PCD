@@ -51,14 +51,6 @@ public class Team implements Serializable {
         return players.size();
     }
 
-    public boolean allPlayersAnswered() {
-        return players.stream().allMatch(Player::hasAnswered);
-    }
-
-    public void resetPlayersForNextRound() {
-        players.forEach(Player::resetForNextRound);
-    }
-
     @Override
     public String toString() {
         return "Team{" +

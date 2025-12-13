@@ -24,7 +24,7 @@ public class QuestionLoader {
                 for(Question question : quiz.getQuestions()){
 //                    if(Math.random() < 0.5) question.setType("individual");
 //                    else question.setType("team");
-                    question.setType("individual");
+                    question.setType("team");
                     System.out.println(question.getType());
                 }
                 return quiz;

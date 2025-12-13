@@ -27,15 +27,13 @@ public class ModifiedCountdownLatch {
         remaining--;
         answeredCount++;
 
-        // Verifica se está dentro dos primeiros N para receber bónus
+        //verificar se recebe bonus
         int multiplier = (answeredCount <= bonusCount) ? bonusFactor : 1;
 
-        // Se todos responderam, podemos marcar como terminado (opcional para a lógica de bónus, mas útil para fluxo)
+        // Se todos responderam
         if (remaining <= 0) {
             finish();
-//            notifyAll();
         }
-
         return multiplier;
     }
 
@@ -45,7 +43,6 @@ public class ModifiedCountdownLatch {
 //            wait(roundtime);
 //        }
 //    }
-
 
     public synchronized void finish() {
         if (!finished) {

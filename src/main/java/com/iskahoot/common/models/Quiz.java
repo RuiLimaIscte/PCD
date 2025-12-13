@@ -22,6 +22,10 @@ public class Quiz implements Serializable {
 
     }
 
+    public void limitQuestions(int limit) {
+        questions = questions.subList(0, limit);
+    }
+
     public String getName() {
         return name;
     }

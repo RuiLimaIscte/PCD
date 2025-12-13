@@ -11,12 +11,12 @@ import static com.iskahoot.utils.QuestionLoader.loadFromFile;
 
 
 public class Game {
-    public enum STATUS {
-        WAITING,    // Waiting for players
-        READY,      // All players connected
-        PLAYING,    // Game in progress
-        FINISHED    // Game ended
-    }
+//    public enum STATUS {
+//        WAITING,    // Waiting for players
+//        READY,      // All players connected
+//        PLAYING,    // Game in progress
+//        FINISHED    // Game ended
+//    }
 
     private final String gameCode;
     private final Quiz quiz;
@@ -25,11 +25,12 @@ public class Game {
     private List<Team> teams = new ArrayList<>();
 //    private STATUS status;
 
-    public Game(String gameCode, int numberOfTeams, int playersPerTeam) {
+    public Game(String gameCode, int numberOfTeams, int playersPerTeam,int nQuestions) {
         this.gameCode = gameCode;
         this.numberOfTeams = numberOfTeams;
         this.playersPerTeam = playersPerTeam;
         this.quiz = loadFromFile("src/main/resources/questions.json");
+        quiz.limitQuestions(nQuestions);
 //        this.status = STATUS.WAITING;
     }
 
@@ -39,19 +40,15 @@ public class Game {
         // Se nao existe, cria e adiciona à lista
         if (team == null) {
             if(teams.size() >= numberOfTeams) {
-                System.out.println("Número máximo de equipas");
+                //System.out.println("Número máximo de equipas");
                 return false;
             }
             team = new Team(teamCode, playersPerTeam);
             teams.add(team);
         }
-
-        //equipa cheia
         if (team.isFull()) {
             return false;
         }
-
-        // Adiciona o jogador
         Player newPlayer = new Player(playerCode, teamCode, gameCode);
         boolean added = team.addPlayer(newPlayer);
 

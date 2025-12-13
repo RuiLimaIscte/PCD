@@ -13,9 +13,6 @@ public class Question implements Serializable {
     private String type;  // "individual" or "team"
     private List<String> options;
 
-    public Question() {
-    }
-
     public Question(String question,int correct, int points, String type, List<String> options) {
         this.question = question;
         this.points = points;
@@ -24,29 +21,16 @@ public class Question implements Serializable {
         this.options = options;
     }
 
-    // Getters and Setters
     public String getQuestion() {
         return question;
-    }
-
-    public void setQuestion(String question) {
-        this.question = question;
     }
 
     public int getPoints() {
         return points;
     }
 
-    public void setPoints(int points) {
-        this.points = points;
-    }
-
     public int getCorrect() {
         return correct;
-    }
-
-    public void setCorrect(int correct) {
-        this.correct = correct;
     }
 
     public String getType() {
@@ -59,10 +43,6 @@ public class Question implements Serializable {
 
     public List<String> getOptions() {
         return options;
-    }
-
-    public void setOptions(List<String> options) {
-        this.options = options;
     }
 
     public boolean isIndividual() {

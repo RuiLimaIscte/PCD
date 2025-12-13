@@ -6,7 +6,7 @@ import java.util.Map;
 
 public class TeamBarrier {
     private final int teamSize;
-    private final Map<String, Integer> teamAnswers; // playerCode -> answerIndex
+    private final Map<String, Integer> teamAnswers; //pode ser uma lista
     private boolean finished = false;
 
     public TeamBarrier(int teamSize) {
@@ -14,24 +14,20 @@ public class TeamBarrier {
         this.teamAnswers = new HashMap<>();
     }
 
-
     public synchronized void registerAnswer(String playerCode, int answerIndex) {
         if (finished) return;
 
         teamAnswers.put(playerCode, answerIndex);
 
-        // Se todos os membros da equipa responderam
         if (teamAnswers.size() >= teamSize) {
             finished = true;
-            // Acorda quem estiver à espera
             notifyAll();
         }
     }
 
-    // A thread da equipa fica presa até registerAnswer chamar notifyAll
+    //presa até registerAnswer chamar notifyAll
     public synchronized void await() throws InterruptedException {
         while (!finished) {
-            // Liberta o lock e dorme
             wait();
         }
     }
@@ -49,15 +45,11 @@ public class TeamBarrier {
                 allCorrect = false;
             }
         }
-        //Acertaram todos
         if (allCorrect) {
-            // Bónus de equipa
             return (questionPoints * teamSize) * 2;
         } else if (anyCorrect) {
-           // Melhor pontuação individual
             return questionPoints;
         } else {
-            // Ninguém acertou
             return 0;
         }
     }
@@ -67,10 +59,4 @@ public class TeamBarrier {
         finished = true;
         notifyAll();
     }
-
-    public synchronized int getAnswerCount() {
-        return teamAnswers.size();
-    }
-
-
 }

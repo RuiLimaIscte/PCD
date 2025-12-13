@@ -10,16 +10,13 @@ public class Player implements Serializable {
     private String teamCode;
     private String gameCode;
     private int individualScore;
-    private boolean hasAnswered;
-    private Integer currentAnswer;
 
     public Player(String playerCode, String teamCode, String gameCode) {
         this.playerCode = playerCode;
         this.teamCode = teamCode;
         this.gameCode = gameCode;
         this.individualScore = 0;
-        this.hasAnswered = false;
-        this.currentAnswer = null;
+
     }
 
     public String getPlayerCode() {
@@ -42,31 +39,6 @@ public class Player implements Serializable {
         return individualScore;
     }
 
-    public void setIndividualScore(int individualScore) {
-        this.individualScore = individualScore;
-    } // Stub, pús isto aqui para eventuais necessidades, mas não sei se será 100% necessário
-
-    public boolean hasAnswered() {
-        return hasAnswered;
-    }
-
-    public void setHasAnswered(boolean hasAnswered) {
-        this.hasAnswered = hasAnswered;
-    }
-
-    public Integer getCurrentAnswer() {
-        return currentAnswer;
-    }
-
-    public void setCurrentAnswer(Integer currentAnswer) {
-        this.currentAnswer = currentAnswer;
-        this.hasAnswered = true; // Stub, faz sentido na minha cabeça, mas veremos como reage com o código.
-    }
-
-    public void resetForNextRound() {
-        this.hasAnswered = false;
-        this.currentAnswer = null;
-    }
 
     @Override
     public String toString() {

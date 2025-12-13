@@ -3,29 +3,28 @@ package com.iskahoot.server;
 import com.iskahoot.common.messages.ConnectionMessage;
 import com.iskahoot.common.messages.QuestionMessage;
 import com.iskahoot.common.messages.ScoreboardData;
-import com.iskahoot.common.messages.TimeMessage;
 import com.iskahoot.common.models.Question;
 
 import java.io.*;
 import java.net.*;
-import java.sql.Timestamp;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
 
 public class GameServer {
-    private int port = 8080;
+    private final int port = 8080;
     private int roomCounter = 0;
 
     private Map<String, GameState> activeGames = new HashMap<>();
 
-    public static void main(String[] args) throws IOException {
+     static void main(String[] args) throws IOException {
         new GameServer().startServing();
     }
 
     public void startServing() throws IOException {
         System.out.println("Server started on port " + port);
 
-        // Thread para criar jogos via consola
-        //TODO POR NUEMRO DE PERGUNTAS MAXIMO
+        // Thread para criar jogos na consola
         new Thread(this::handleConsoleCommands).start();
 
         ServerSocket serverSocket = new ServerSocket(port);
@@ -45,10 +44,11 @@ public class GameServer {
             if (scanner.next().equalsIgnoreCase("new")) {
                 int nTeams = scanner.nextInt();
                 int nPlayers = scanner.nextInt();
+                int nQuestions = scanner.nextInt();
 
                 String code = "game" + roomCounter++;
 
-                Game game = new Game(code, nTeams, nPlayers);
+                Game game = new Game(code, nTeams, nPlayers,nQuestions);
                 GameState gameState = new GameState(game);
 
                 synchronized (activeGames) {
@@ -62,10 +62,10 @@ public class GameServer {
     }
 
     public static class DealWithClient extends Thread {
-        private Socket socket;
+        private final Socket socket;
         private ObjectOutputStream out;
         private ObjectInputStream in;
-        private Map<String, GameState> games;
+        private final Map<String, GameState> games;
         private GameState gameState;
 
         public DealWithClient(Socket socket, Map<String, GameState> games) {
@@ -82,7 +82,6 @@ public class GameServer {
 
                 if (obj instanceof ConnectionMessage) {
                     ConnectionMessage msg = (ConnectionMessage) obj;
-//                    GameState gameState;
                     synchronized (games) {
                         gameState = games.get(msg.getGameCode());
                         games.put(msg.getGameCode(), gameState);
@@ -119,7 +118,6 @@ public class GameServer {
             while (true) {
                 Object obj = in.readObject();
 
-                System.out.println("Recebi objeto do cliente: " + obj.getClass().getSimpleName());
                 if (obj instanceof QuestionMessage) {
                     QuestionMessage resposta = (QuestionMessage) obj;
                     System.out.println("Resposta: " + resposta.getSelectedAnswerIndex() + " de: " + resposta.getClientCode());
@@ -132,7 +130,6 @@ public class GameServer {
         public void sendQuestion(Question q, long currentTimeMillis, int timeToEndRound) throws IOException {
             out.writeObject(new QuestionMessage(q.getQuestion(),q.getType(), q.getOptions(), currentTimeMillis, timeToEndRound));
             out.flush();
-            System.out.println("Enviada pergunta ao cliente.");
         }
 
         public void sendScoreboard(ScoreboardData data) throws IOException {
@@ -140,14 +137,7 @@ public class GameServer {
             out.flush();
         }
 
-
-        public void sendTime(long timestamp, int roundTime) throws IOException, ClassNotFoundException {
-            TimeMessage timeMessage = new TimeMessage(timestamp, roundTime);
-            out.writeObject(timeMessage);
-            out.flush();
-        }
-
-        private void closeConnection() {
+        public void closeConnection() {
             try {
                 if (socket != null)
                     socket.close();

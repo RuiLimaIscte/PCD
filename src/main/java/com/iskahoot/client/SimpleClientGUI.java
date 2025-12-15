@@ -136,7 +136,7 @@ public class SimpleClientGUI extends JFrame {
             int timeLeft = totalSeconds;
             try {
                 while (timeLeft >= 0) {
-                    timerLabel.setText("Timer: " + timeLeft);
+                    timerLabel.setText("Timer - " + timeLeft);
                     if (timeLeft <= 5) {
                         timerLabel.setForeground(Color.RED);
                     } else {

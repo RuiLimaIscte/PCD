@@ -68,9 +68,5 @@ public class Team implements Serializable {
         return teamCode.equals(team.teamCode);
     }
 
-    @Override
-    public int hashCode() {
-        return teamCode.hashCode();
-    }
 }
 

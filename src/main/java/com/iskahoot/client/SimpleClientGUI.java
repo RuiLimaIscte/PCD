@@ -30,7 +30,7 @@ public class SimpleClientGUI extends JFrame {
         this.player = clientInfo;
         this.listener = listener;
 
-        setTitle("Kahoot Client - " + player.getPlayerCode() + " " + player.getTeamCode() + " " + player.getGameCode() + " " + questionMessage.getQuestionType() );
+        setTitle("Kahoot Client: " + player.getPlayerCode() + " " + player.getTeamCode() + " " + player.getGameCode() + " " + questionMessage.getQuestionType() );
         setSize(700, 300);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -71,11 +71,11 @@ public class SimpleClientGUI extends JFrame {
 
         scoreboardArea = new JTextArea();
         scoreboardArea.setEditable(false);
-        scoreboardArea.setText("Waiting for scoreboard...");
+        scoreboardArea.setText("Waiting for scoreboard");
         sidePanel.add(new JScrollPane(scoreboardArea), BorderLayout.CENTER);
 
         // Timer
-        timerLabel = new JLabel("Timer: 30", SwingConstants.CENTER);
+        timerLabel = new JLabel("Timer - 30", SwingConstants.CENTER);
         timerLabel.setFont(new Font("Arial", Font.BOLD, 14));
         sidePanel.add(timerLabel, BorderLayout.SOUTH);
 
@@ -92,10 +92,10 @@ public class SimpleClientGUI extends JFrame {
     public void updateScoreboard(ScoreboardData data) {
         StringBuilder sb = new StringBuilder();
 
-        sb.append("=== RONDA ").append(data.getCurrentRound())
-                .append("/").append(data.getTotalRounds()).append(" ===\n\n");
+        sb.append(" RONDA ").append(data.getCurrentRound())
+                .append("/").append(data.getTotalRounds()).append(" \n\n");
 
-        // Itera sobre as equipas ordenando por pontuação total
+        // Iterar pelas equipas e ordenandar por pontuação total
         data.getTeamScores().entrySet().stream()
                 .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
                 .forEach(entry -> {
@@ -127,8 +127,8 @@ public class SimpleClientGUI extends JFrame {
             optionButtons[i].setEnabled(true);
         }
 
-        timerLabel.setText("Timer: 30");
-        setTitle("Kahoot Client - " + player.getPlayerCode() + " " + player.getTeamCode() + " " + player.getGameCode() + " " + questionMessage.getQuestionType() );
+        timerLabel.setText("Timer - 30");
+        setTitle("Kahoot Client: " + player.getPlayerCode() + " " + player.getTeamCode() + " " + player.getGameCode() + " " + questionMessage.getQuestionType() );
     }
 
     public void startTimer(int totalSeconds) {
@@ -168,10 +168,8 @@ public class SimpleClientGUI extends JFrame {
             }
         }
         if (questionMessage != null && listener != null) {
-            // O Cliente preenche o campo vazio
             questionMessage.setSelectedAnswerIndex(index);
             questionMessage.setClientCode(player.getPlayerCode());
-            // Envia o objeto modificado ao listener
             listener.onAnswerSelected(questionMessage);
         }
         //System.out.println("Selected: " + index);

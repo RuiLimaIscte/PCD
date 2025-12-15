@@ -38,10 +38,6 @@ public class Quiz implements Serializable {
         return questions;
     }
 
-    public void setQuestions(List<Question> questions) {
-        this.questions = questions;
-    }
-
     public Question getQuestion(int index) {
         return questions.get(index);
     }

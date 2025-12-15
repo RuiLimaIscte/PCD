@@ -1,14 +1,12 @@
 package com.iskahoot.utils;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.iskahoot.common.models.Question;
 import com.iskahoot.common.models.Quiz;
 
 import java.io.*;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
+
 
 
 
@@ -22,10 +20,10 @@ public class QuestionLoader {
                 jsonReader = readDataFromFile(filePath);
                 Quiz quiz = gson.fromJson(jsonReader, Quiz.class);
                 for(Question question : quiz.getQuestions()){
-//                    if(Math.random() < 0.5) question.setType("individual");
-//                    else question.setType("team");
-                    question.setType("team");
-                    System.out.println(question.getType());
+                    if(Math.random() < 0.5) question.setType("individual");
+                    else question.setType("team");
+//                    question.setType("team");
+//                    System.out.println(question.getType());
                 }
                 return quiz;
 

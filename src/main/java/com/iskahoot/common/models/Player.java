@@ -57,9 +57,5 @@ public class Player implements Serializable {
         return playerCode.equals(player.playerCode);
     }
 
-    @Override
-    public int hashCode() {
-        return playerCode.hashCode();
-    }
 }
 

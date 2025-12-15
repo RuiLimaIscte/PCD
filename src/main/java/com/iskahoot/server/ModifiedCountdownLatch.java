@@ -1,8 +1,5 @@
 package com.iskahoot.server;
 
-import java.util.Timer;
-import java.util.TimerTask;
-
 public class ModifiedCountdownLatch {
     private final int bonusFactor;
     private final int bonusCount;
@@ -18,7 +15,7 @@ public class ModifiedCountdownLatch {
         this.remaining = totalCount;
     }
 
-    // Calcula a pontuação tendo em conta a ordem de chegada
+    // Calcula o bonus tendo em conta a ordem de chegada
     public synchronized int countdown() {
         if (finished) {
             return 0;
@@ -51,7 +48,4 @@ public class ModifiedCountdownLatch {
         }
     }
 
-    public synchronized boolean isFinished() {
-        return finished;
-    }
 }

@@ -98,7 +98,7 @@ public class GameState extends Thread {
                 broadcastScoreboard(currentQuestionIndex + 1, game.getQuiz().getQuestions().size(), scoresBeforeRound);
 
                 //tempo para ver scoreboard
-                Thread.sleep(2000);
+                //Thread.sleep(2000);
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -181,7 +181,6 @@ public class GameState extends Thread {
         if (currentQuestionIndex >= game.getQuiz().getQuestions().size()) return;
 
         Question currentQ = game.getQuiz().getQuestion(currentQuestionIndex);
-        // Registar que este cliente respondeu
         playersWhoAnswered.add(clientCode);
        // System.out.println("Resposta recebida de " + clientCode);
 
@@ -195,7 +194,6 @@ public class GameState extends Thread {
         } else {
             processTeamAnswer(player, answerIndex);
         }
-        // Verificar se todos já responderam
         if (playersWhoAnswered.size() >= connectedClients.size()) {
             //System.out.println("Responderam todos");
             //desbloqueia a thread do jogo

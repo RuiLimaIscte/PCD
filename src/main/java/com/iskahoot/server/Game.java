@@ -11,19 +11,12 @@ import static com.iskahoot.utils.QuestionLoader.loadFromFile;
 
 
 public class Game {
-//    public enum STATUS {
-//        WAITING,    // Waiting for players
-//        READY,      // All players connected
-//        PLAYING,    // Game in progress
-//        FINISHED    // Game ended
-//    }
 
     private final String gameCode;
     private final Quiz quiz;
     private final int numberOfTeams;
     private final int playersPerTeam;
     private List<Team> teams = new ArrayList<>();
-//    private STATUS status;
 
     public Game(String gameCode, int numberOfTeams, int playersPerTeam,int nQuestions) {
         this.gameCode = gameCode;
@@ -31,7 +24,6 @@ public class Game {
         this.playersPerTeam = playersPerTeam;
         this.quiz = loadFromFile("src/main/resources/questions.json");
         quiz.limitQuestions(nQuestions);
-//        this.status = STATUS.WAITING;
     }
 
     public synchronized boolean addPlayer(String teamCode, String playerCode) {
@@ -40,7 +32,6 @@ public class Game {
         // Se nao existe, cria e adiciona à lista
         if (team == null) {
             if(teams.size() >= numberOfTeams) {
-                //System.out.println("Número máximo de equipas");
                 return false;
             }
             team = new Team(teamCode, playersPerTeam);
@@ -54,18 +45,13 @@ public class Game {
 
         if (added) {
             System.out.println("Adicionado " + playerCode + " à equipa " + teamCode);
-            // Check if room is ready to start
-//            if (isGameFull()) {
-////                status = STATUS.READY;
-//                System.out.println("Room " + gameCode + " ready");
-//            }
             return true;
         }
         return false;
     }
 
     public Team getTeam(String teamCode) {
-        synchronized (teams) { // Proteção para iteração
+        synchronized (teams) {
             for (Team t : teams) {
                 if (t.getTeamCode().equals(teamCode)) { //
                     return t;
@@ -74,19 +60,6 @@ public class Game {
         }
         return null;
     }
-
-//    public synchronized boolean canStartGame() {
-//        if (status != STATUS.READY) {
-//            System.out.println("Room is not ready to start, waiting for players to join...");
-//            return false;
-//        }
-//
-//        status = STATUS.PLAYING;
-//
-//        System.out.println("Game starting in room: " + gameCode);
-//
-//        return true;
-//    }
 
     public boolean isGameFull() {
         return getConnectedPlayersCount() >= getExpectedPlayers();
@@ -118,14 +91,6 @@ public class Game {
             return teams.stream().mapToInt(Team::getPlayerCount).sum(); //
         }
     }
-//
-//    public STATUS getStatus() {
-//        return status;
-//    }
-
-//    public void setStatus(STATUS status) {
-//        this.status = status;
-//    }
 
     public Quiz getQuiz() {
         return quiz;
